@@ -1,0 +1,11 @@
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
+
+#app {
+    width: 100%;
+}
+
+.group-invalid-feedback .selectr-selected {
+    border-color: #ef4d56!important;
+}
