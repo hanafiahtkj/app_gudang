@@ -11,6 +11,7 @@ use App\Models\Product;
 use DataTables;
 use Str;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Redirect;
 
 class PurchaseController extends Controller
 {
@@ -78,6 +79,8 @@ class PurchaseController extends Controller
                 PurchaseDetails::create($purchaseDetails);
             }
         }
+
+        return Redirect::route('purchases.index');
     }
 
     /**
@@ -156,6 +159,8 @@ class PurchaseController extends Controller
                 }
             }
         }
+
+        return Redirect::route('purchases.index');
     }
 
     /**

@@ -11,6 +11,7 @@ use App\Models\Product;
 use DataTables;
 use Str;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Redirect;
 
 class SaleController extends Controller
 {
@@ -80,6 +81,8 @@ class SaleController extends Controller
                 SaleDetails::create($saleDetails);
             }
         }
+
+        return Redirect::route('sales.index');
     }
 
     /**
