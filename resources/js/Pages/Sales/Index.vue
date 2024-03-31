@@ -4,6 +4,7 @@ import { ref, onMounted } from "vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 import { Modal } from "momentum-modal";
 import Swal from "sweetalert2";
+import accounting from "accounting";
 
 let datatable;
 
@@ -46,6 +47,16 @@ const setupEventListeners = () => {
     });
 };
 
+const formatCurrency = (value) => {
+    const decimalCount = (value.toString().split(".")[1] || "").length;
+    return accounting.formatMoney(value, {
+        symbol: "", // Tidak menampilkan simbol mata uang
+        precision: decimalCount || 0, // Menampilkan 2 angka di belakang koma
+        thousand: ",", // Menyusun ribuan dengan titik
+        decimal: ".", // Menyusun desimal dengan koma
+    });
+};
+
 const redrawDataTable = () => {
     if (datatable) {
         datatable.ajax.reload(null, false);
@@ -67,7 +78,12 @@ const loadData = async () => {
                 { data: "sale_date" },
                 { data: "warehouse.name" },
                 { data: "total_products" },
-                { data: "total" },
+                {
+                    data: "total",
+                    render: function (data, type, row) {
+                        return formatCurrency(data);
+                    },
+                },
                 {
                     data: null,
                     render: function (data, type, row) {

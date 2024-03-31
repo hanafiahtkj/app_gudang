@@ -9,6 +9,7 @@ use App\Models\Laba;
 use DataTables;
 use Str;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class LabaController extends Controller
 {
@@ -112,7 +113,20 @@ class LabaController extends Controller
         $tanggal = $request->input('tanggal');
         $input['tanggal'] = Carbon::createFromFormat('d/m/Y', $request->tanggal)->format('Y-m-d');
         $laba = Laba::where('tanggal', $input['tanggal'])->first();
-        $proses = $laba;
+        if (!$laba) {
+            $sales = DB::table('sales')->select( DB::raw('SUM(total) as total_sales'))->where('sale_date', $input['tanggal'])->first();
+
+            $proses = [
+                'penjualan' => 0,
+                'pengeluaran' => @$sales->total_sales ?? 0,
+                'laba' => 0,
+                'laba_pemilik' => 0,
+                'laba_karyawan' => 0,
+            ];
+        }
+        else {
+            $proses = $laba;
+        }
 
         return response()->json([
             'proses' => $proses,

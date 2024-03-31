@@ -6,6 +6,7 @@ import { Modal } from "momentum-modal";
 import Swal from "sweetalert2";
 import { format } from "date-fns";
 import CurrencyInput from "@/Components/CurrencyInput.vue";
+import accounting from "accounting";
 
 const props = defineProps({
     warehouses: {
@@ -53,7 +54,7 @@ const addProduct = (product) => {
         product: product,
         product_id: product.id,
         quantity: 0,
-        unitcost: 0,
+        unitcost: product.unitcost,
         total: 0,
     });
     form.sale_details = tempSaleDetails;
@@ -98,6 +99,16 @@ watch(
     { deep: true }
 );
 
+const formatCurrency = (value) => {
+    const decimalCount = (value.toString().split(".")[1] || "").length;
+    return accounting.formatMoney(value, {
+        symbol: "", // Tidak menampilkan simbol mata uang
+        precision: decimalCount || 0, // Menampilkan 2 angka di belakang koma
+        thousand: ",", // Menyusun ribuan dengan titik
+        decimal: ".", // Menyusun desimal dengan koma
+    });
+};
+
 onMounted(() => {
     // selectrWarehouse = new Selectr("#warehouse");
 
@@ -135,9 +146,22 @@ const loadData = async () => {
                 url: route("products.loadDatatables"),
                 data: function (d) {
                     d.warehouse_id = form.warehouse_id;
+                    d.product_ids = form.sale_details.map(
+                        (detail) => detail.product_id
+                    );
                 },
             },
-            columns: [{ data: "name" }, { data: "unit" }, { data: "stock" }],
+            columns: [
+                { data: "name" },
+                { data: "unit" },
+                { data: "stock" },
+                {
+                    data: "unitcost",
+                    render: function (data, type, row) {
+                        return formatCurrency(data);
+                    },
+                },
+            ],
         });
 
         datatable.on("select", function (e, dt, type, indexes) {
@@ -281,6 +305,7 @@ const loadData = async () => {
                                                         <th>Nama</th>
                                                         <th>Stock</th>
                                                         <th>Jumlah</th>
+                                                        <th>Harga Acuan</th>
                                                         <th>Harga</th>
                                                         <th>Total</th>
                                                         <th class="text-center">
@@ -326,6 +351,44 @@ const loadData = async () => {
                                                             />
                                                         </td>
                                                         <td>
+                                                            <div
+                                                                class="input-group"
+                                                            >
+                                                                <CurrencyInput
+                                                                    class="form-control"
+                                                                    :class="{
+                                                                        'is-invalid':
+                                                                            form
+                                                                                .errors[
+                                                                                'sale_details.' +
+                                                                                    index +
+                                                                                    '.quantity'
+                                                                            ],
+                                                                    }"
+                                                                    type="text"
+                                                                    v-model="
+                                                                        form
+                                                                            .sale_details[
+                                                                            index
+                                                                        ]
+                                                                            .quantity
+                                                                    "
+                                                                />
+                                                                <span
+                                                                    class="input-group-text"
+                                                                    id="basic-addon2"
+                                                                    >{{
+                                                                        form
+                                                                            .sale_details[
+                                                                            index
+                                                                        ]
+                                                                            .product
+                                                                            .unit
+                                                                    }}</span
+                                                                >
+                                                            </div>
+                                                        </td>
+                                                        <td>
                                                             <CurrencyInput
                                                                 class="form-control"
                                                                 :class="{
@@ -334,7 +397,7 @@ const loadData = async () => {
                                                                             .errors[
                                                                             'sale_details.' +
                                                                                 index +
-                                                                                '.quantity'
+                                                                                '.unitcost'
                                                                         ],
                                                                 }"
                                                                 type="text"
@@ -342,8 +405,10 @@ const loadData = async () => {
                                                                     form
                                                                         .sale_details[
                                                                         index
-                                                                    ].quantity
+                                                                    ].product
+                                                                        .unitcost
                                                                 "
+                                                                disabled
                                                             />
                                                         </td>
                                                         <td>
@@ -519,6 +584,7 @@ const loadData = async () => {
                                         <th>Name</th>
                                         <th>Unit</th>
                                         <th>Stock</th>
+                                        <th>Harga</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>

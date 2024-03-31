@@ -135,12 +135,11 @@ class SaleController extends Controller
 
         $sale_details = $request->sale_details;
         $arr_id = array_filter(array_column($sale_details, 'id'));
-        SaleDetails::where('sale_id', $id)
-            ->when(!empty($arr_id), function ($query) use ($arr_id) {
-                $query->whereNotIn('id', $arr_id);
-            }, function ($query) {
-                $query->delete();
-            });
+        $query = SaleDetails::where('sale_id', $id);
+        if (!empty($arr_id)) {
+            $query->whereNotIn('id', $arr_id);
+        }
+        $query->delete();
 
         if ($request->sale_details) {
             foreach ($request->sale_details as $key => $value) {

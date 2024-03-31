@@ -21,6 +21,11 @@ class ProductController extends Controller
 
     public function loadDatatables(Request $request)
     {
+        $latestUnitCostSubQuery = DB::table('purchase_details as pd')
+            ->select('pd.product_id', 'pd.unitcost')
+            ->whereRaw('pd.id IN (SELECT MAX(id) FROM purchase_details WHERE product_id = pd.product_id)')
+            ->groupBy('pd.product_id', 'pd.unitcost');
+
         $purchaseQuery = DB::table('purchase_details')
             ->join('purchases', 'purchase_details.purchase_id', '=', 'purchases.id')
             ->select('purchase_details.product_id', 'purchases.warehouse_id', DB::raw('SUM(purchase_details.quantity) as total_purchase'))
@@ -37,14 +42,22 @@ class ProductController extends Controller
             ->leftJoinSub($saleQuery, 'sales', function ($join) {
                 $join->on('products.id', '=', 'sales.product_id');
             })
+            ->leftJoinSub($latestUnitCostSubQuery, 'unitcosts', function ($join) {
+                $join->on('products.id', '=', 'unitcosts.product_id');
+            })
             ->select('products.*',
-                    DB::raw('COALESCE(purchases.total_purchase, 0) - COALESCE(sales.total_sale, 0) as stock'));
+                    DB::raw('COALESCE(purchases.total_purchase, 0) - COALESCE(sales.total_sale, 0) as stock'),
+                    'unitcosts.unitcost as unitcost');
 
         if ($request->has('warehouse_id')) {
             $model->where(function ($query) use ($request) {
                 $query->where('purchases.warehouse_id', $request->warehouse_id)
                     ->orWhere('sales.warehouse_id', $request->warehouse_id);
             });
+        }
+
+        if ($request->has('product_ids')) {
+            $model->whereNotIn('id', $request->product_ids);
         }
 
         return DataTables::of($model)->toJson();
@@ -68,7 +81,7 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required',
             'unit' => 'required',
-            'description' => 'required',
+            // 'description' => 'required',
         ]);
 
         Product::create([
@@ -104,7 +117,7 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required',
             'unit' => 'required',
-            'description' => 'required',
+            // 'description' => 'required',
         ]);
 
         $data = Product::findOrFail($id);

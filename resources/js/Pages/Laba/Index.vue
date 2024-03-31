@@ -6,6 +6,7 @@ import { Modal } from "momentum-modal";
 import Swal from "sweetalert2";
 import { format } from "date-fns";
 import CurrencyInput from "@/Components/CurrencyInput.vue";
+import accounting from "accounting";
 
 const props = defineProps({
     nilai: {
@@ -40,6 +41,7 @@ const submit = () => {
                 icon: "success",
                 showCloseButton: true,
             });
+            redrawDataTable();
         },
     });
 };
@@ -83,6 +85,16 @@ const setupEventListeners = () => {
     });
 };
 
+const formatCurrency = (value) => {
+    const decimalCount = (value.toString().split(".")[1] || "").length;
+    return accounting.formatMoney(value, {
+        symbol: "", // Tidak menampilkan simbol mata uang
+        precision: decimalCount || 0, // Menampilkan 2 angka di belakang koma
+        thousand: ",", // Menyusun ribuan dengan titik
+        decimal: ".", // Menyusun desimal dengan koma
+    });
+};
+
 const redrawDataTable = () => {
     if (datatable) {
         datatable.ajax.reload(null, false);
@@ -98,24 +110,38 @@ const loadData = async () => {
                 [5, 10, 50, "All"],
             ],
             ajax: {
-                url: route("categories.loadDatatables"),
+                url: route("laba.loadDatatables"),
             },
             columns: [
-                { data: "name" },
+                { data: "tanggal" },
                 {
-                    data: null,
+                    data: "penjualan",
                     render: function (data, type, row) {
-                        return `
-                            <div class="dropdown">
-                                <button class="btn btn-sm btn-icon btn-default me-1" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <a class="dropdown-item edit-link" href="#" data-user-id="${row.id}">Edit</a>
-                                    <a class="dropdown-item delete-link" href="#" data-user-id="${row.id}">Delete</a>
-                                </div>
-                            </div>
-                        `;
+                        return formatCurrency(data);
+                    },
+                },
+                {
+                    data: "pengeluaran",
+                    render: function (data, type, row) {
+                        return formatCurrency(data);
+                    },
+                },
+                {
+                    data: "laba",
+                    render: function (data, type, row) {
+                        return formatCurrency(data);
+                    },
+                },
+                {
+                    data: "laba_pemilik",
+                    render: function (data, type, row) {
+                        return formatCurrency(data);
+                    },
+                },
+                {
+                    data: "laba_karyawan",
+                    render: function (data, type, row) {
+                        return formatCurrency(data);
                     },
                 },
             ],
@@ -148,6 +174,7 @@ const loadProsesData = async () => {
 };
 
 onMounted(() => {
+    loadData();
     loadProsesData();
 
     var elem = document.querySelector("#date");
@@ -160,6 +187,22 @@ onMounted(() => {
         loadProsesData();
     });
 });
+
+watch(
+    () => form.penjualan,
+    (newValue, oldValue) => {
+        const total = newValue - form.pengeluaran;
+        form.laba = total;
+    }
+);
+
+watch(
+    () => form.laba,
+    (newValue, oldValue) => {
+        form.laba_pemilik = (form.persen_pemilik / 100) * newValue;
+        form.laba_karyawan = (form.persen_karyawan / 100) * newValue;
+    }
+);
 </script>
 
 <template>
@@ -384,6 +427,42 @@ onMounted(() => {
             </div>
             <!-- end row -->
         </form>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="">
+                            <h3 class="card-title">Daftar Laba Harian</h3>
+                        </div>
+                    </div>
+                    <!--end card-header-->
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table
+                                class="table"
+                                id="datatables"
+                                style="width: 100%"
+                            >
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Tanggal</th>
+                                        <th>Penjualan</th>
+                                        <th>Pengeluaran</th>
+                                        <th>Laba</th>
+                                        <th>Laba Pemilik</th>
+                                        <th>Laba Karyawan</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end col -->
+        </div>
+        <!-- end row -->
 
         <Modal :redrawDataTable="redrawDataTable" />
     </AuthenticatedLayout>

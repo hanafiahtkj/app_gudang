@@ -71,7 +71,7 @@ const removeProduct = (index) => {
 const totalAmount = computed(() => {
     let total = 0;
     form.sale_details.forEach((detail) => {
-        total += detail.total;
+        total += parseFloat(detail.total);
     });
     return total;
 });

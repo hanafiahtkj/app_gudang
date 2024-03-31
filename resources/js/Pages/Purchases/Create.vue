@@ -256,24 +256,40 @@ onMounted(() => {
                                                         />
                                                     </td>
                                                     <td>
-                                                        <CurrencyInput
-                                                            class="form-control"
-                                                            :class="{
-                                                                'is-invalid':
-                                                                    form.errors[
-                                                                        'purchase_details.' +
-                                                                            index +
-                                                                            '.quantity'
-                                                                    ],
-                                                            }"
-                                                            type="text"
-                                                            v-model="
-                                                                form
-                                                                    .purchase_details[
-                                                                    index
-                                                                ].quantity
-                                                            "
-                                                        />
+                                                        <div
+                                                            class="input-group"
+                                                        >
+                                                            <CurrencyInput
+                                                                class="form-control"
+                                                                :class="{
+                                                                    'is-invalid':
+                                                                        form
+                                                                            .errors[
+                                                                            'purchase_details.' +
+                                                                                index +
+                                                                                '.quantity'
+                                                                        ],
+                                                                }"
+                                                                type="text"
+                                                                v-model="
+                                                                    form
+                                                                        .purchase_details[
+                                                                        index
+                                                                    ].quantity
+                                                                "
+                                                            />
+                                                            <span
+                                                                class="input-group-text"
+                                                                id="basic-addon2"
+                                                                >{{
+                                                                    form
+                                                                        .purchase_details[
+                                                                        index
+                                                                    ].product
+                                                                        .unit
+                                                                }}</span
+                                                            >
+                                                        </div>
                                                     </td>
                                                     <td>
                                                         <CurrencyInput

@@ -131,12 +131,11 @@ class PurchaseController extends Controller
 
         $purchase_details = $request->purchase_details;
         $arr_id = array_filter(array_column($purchase_details, 'id'));
-        PurchaseDetails::where('purchase_id', $id)
-            ->when(!empty($arr_id), function ($query) use ($arr_id) {
-                $query->whereNotIn('id', $arr_id);
-            }, function ($query) {
-                $query->delete();
-            });
+        $query = PurchaseDetails::where('purchase_id', $id);
+        if (!empty($arr_id)) {
+            $query->whereNotIn('id', $arr_id);
+        }
+        $query->delete();
 
         if ($request->purchase_details) {
             foreach ($request->purchase_details as $key => $value) {
