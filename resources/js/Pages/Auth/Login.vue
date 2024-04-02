@@ -109,7 +109,7 @@ const submit = () => {
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-lg-4 mx-auto">
-                                    <div class="card">
+                                    <div class="card shadow-sm">
                                         <div
                                             class="card-body p-0 auth-header-box"
                                         >
@@ -131,11 +131,11 @@ const submit = () => {
                                                 <h4
                                                     class="mt-3 mb-1 fw-semibold text-white font-18"
                                                 >
-                                                    Aplikasi Inventaris
+                                                    Aplikasi Jack Kolam
                                                 </h4>
                                                 <p class="text-muted mb-0">
                                                     Masuk untuk melanjutkan ke
-                                                    Aplikasi Inventaris.
+                                                    Aplikasi Jack Kolam.
                                                 </p>
                                             </div>
                                         </div>

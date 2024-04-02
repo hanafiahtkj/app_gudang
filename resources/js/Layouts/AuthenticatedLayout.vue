@@ -28,8 +28,9 @@ const showingNavigationDropdown = ref(false);
                         class="logo-sm"
                     />
                 </span>
-                <span>
-                    <img
+                <span class="fs-5 fw-bolder" style="color: #c2cbe2">
+                    Jack Kolam
+                    <!-- <img
                         :src="
                             route('index') +
                             '/vendor/metrica/dist/assets/images/logo.png'
@@ -44,7 +45,7 @@ const showingNavigationDropdown = ref(false);
                         "
                         alt="logo-large"
                         class="logo-lg logo-dark"
-                    />
+                    /> -->
                 </span>
             </a>
         </div>
@@ -368,11 +369,11 @@ const showingNavigationDropdown = ref(false);
     <!--Start Footer-->
     <!-- Footer Start -->
     <footer class="footer text-center text-sm-start">
-        &copy; 2024 Inventaris
-        <span class="text-muted d-none d-sm-inline-block float-end"
+        &copy; 2024 Jack Kolam
+        <!-- <span class="text-muted d-none d-sm-inline-block float-end"
             >Crafted with <i class="mdi mdi-heart text-danger"></i> by
             Mannatthemes</span
-        >
+        >-->
     </footer>
     <!-- end Footer -->
     <!--end footer-->

@@ -66,7 +66,17 @@ const redrawDataTable = () => {
 const loadData = async () => {
     try {
         datatable = $("#datatables").DataTable({
-            // responsive: true,
+            responsive: true,
+            dom:
+                "<'row'<'col-3'l><'col-9'f>>" +
+                "<'row dt-row'<'col-sm-12'tr>>" +
+                "<'row'<'col-4'i><'col-8'p>>",
+            language: {
+                info: "Page _PAGE_ of _PAGES_",
+                lengthMenu: "_MENU_ ",
+                search: "",
+                searchPlaceholder: "Search..",
+            },
             lengthMenu: [
                 [5, 10, 50, -1],
                 [5, 10, 50, "All"],
