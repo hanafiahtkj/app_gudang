@@ -153,11 +153,11 @@ onMounted(() => {
                     <div class="card-body">
                         <div class="table-responsive">
                             <table
-                                class="table"
+                                class="table table-striped"
                                 id="datatables"
                                 style="width: 100%"
                             >
-                                <thead class="thead-light">
+                                <thead class="">
                                     <tr>
                                         <th>Nama</th>
                                         <th>Alamat</th>
