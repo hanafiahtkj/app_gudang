@@ -133,7 +133,7 @@ class PurchaseController extends Controller
         $purchase = Purchase::findOrFail($id);
         $input = $request->except(['created_at', 'updated_at']);
         $purchase->update([
-            // "date" => Carbon::createFromFormat('d/m/Y', $request->date)->format('Y-m-d'),
+            "date" => Carbon::createFromFormat('d/m/Y', $request->date)->format('Y-m-d'),
             "warehouse_id" => $request->warehouse_id,
             'total_amount' => $request->total_amount
         ]);

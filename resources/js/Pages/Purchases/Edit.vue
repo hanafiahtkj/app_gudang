@@ -19,8 +19,10 @@ const props = defineProps({
     },
 });
 
+console.log(format(props.data.date, "dd/MM/yyyy"));
+
 const form = useForm({
-    date: format(props.data.date, "dd/MM/yyyy"),
+    date: "",
     warehouse_id: "",
     total_amount: 0,
     purchase_details: [],
@@ -104,6 +106,8 @@ watch(
 
 onMounted(() => {
     // selectrWarehouse = new Selectr("#warehouse");
+
+    form.date = format(props.data.date, "dd/MM/yyyy");
 
     selectrProduct = new Selectr("#product");
 
