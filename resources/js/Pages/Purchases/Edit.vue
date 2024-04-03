@@ -104,7 +104,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <Head title="Pembelian" />
+    <Head title="Pemasukan" />
 
     <AuthenticatedLayout>
         <div class="row">
@@ -112,7 +112,7 @@ onMounted(() => {
                 <div class="page-title-box">
                     <div class="row">
                         <div class="col align-self-center">
-                            <h4 class="page-title pb-md-0">Pembelian</h4>
+                            <h4 class="page-title pb-md-0">Pemasukan</h4>
                         </div>
                         <!--end col-->
                         <div class="col-auto align-self-center">
@@ -121,7 +121,7 @@ onMounted(() => {
                                     <a href="javascript:void(0);">Dashboard</a>
                                 </li>
                                 <li class="breadcrumb-item active">
-                                    Pembelian
+                                    Pemasukan
                                 </li>
                             </ol>
                         </div>
@@ -140,7 +140,7 @@ onMounted(() => {
                     <div class="card">
                         <div class="card-header py-3">
                             <div class="d-flex justify-content-between">
-                                <h5 class="card-title">Pembelian Baru</h5>
+                                <h5 class="card-title">Pemasukan Baru</h5>
                                 <Link
                                     :href="route('purchases.index')"
                                     class="btn-close"
@@ -151,7 +151,7 @@ onMounted(() => {
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <h6>Tanggal Pembelian</h6>
+                                    <h6>Tanggal Pemasukan</h6>
                                     <input
                                         id="date"
                                         class="form-control mb-3"

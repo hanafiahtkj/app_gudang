@@ -124,7 +124,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <Head title="Penjualan" />
+    <Head title="Pengeluaran" />
 
     <AuthenticatedLayout>
         <div class="row">
@@ -132,7 +132,7 @@ onMounted(() => {
                 <div class="page-title-box">
                     <div class="row">
                         <div class="col align-self-center">
-                            <h4 class="page-title pb-md-0">Penjualan</h4>
+                            <h4 class="page-title pb-md-0">Pengeluaran</h4>
                         </div>
                         <!--end col-->
                         <div class="col-auto align-self-center">
@@ -141,7 +141,7 @@ onMounted(() => {
                                     <a href="javascript:void(0);">Dashboard</a>
                                 </li>
                                 <li class="breadcrumb-item active">
-                                    Penjualan
+                                    Pengeluaran
                                 </li>
                             </ol>
                         </div>
@@ -177,7 +177,9 @@ onMounted(() => {
                             >
                                 <thead class="">
                                     <tr>
-                                        <th>Tanggal Penjualan</th>
+                                        <th style="max-width: 250px">
+                                            Tanggal Pengeluaran
+                                        </th>
                                         <th>Gudang</th>
                                         <th>Jumlah Produk</th>
                                         <th>Total Harga</th>

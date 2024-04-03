@@ -178,7 +178,7 @@ const loadData = async () => {
 </script>
 
 <template>
-    <Head title="Penjualan" />
+    <Head title="Pengeluaran" />
 
     <AuthenticatedLayout>
         <div class="row">
@@ -186,7 +186,7 @@ const loadData = async () => {
                 <div class="page-title-box">
                     <div class="row">
                         <div class="col align-self-center">
-                            <h4 class="page-title pb-md-0">Penjualan</h4>
+                            <h4 class="page-title pb-md-0">Pengeluaran</h4>
                         </div>
                         <!--end col-->
                         <div class="col-auto align-self-center">
@@ -195,7 +195,7 @@ const loadData = async () => {
                                     <a href="javascript:void(0);">Dashboard</a>
                                 </li>
                                 <li class="breadcrumb-item active">
-                                    Penjualan
+                                    Pengeluaran
                                 </li>
                             </ol>
                         </div>
@@ -214,7 +214,7 @@ const loadData = async () => {
                     <div class="card">
                         <div class="card-header py-3">
                             <div class="d-flex justify-content-between">
-                                <h5 class="card-title">Penjualan Baru</h5>
+                                <h5 class="card-title">Pengeluaran Baru</h5>
                                 <Link
                                     :href="route('sales.index')"
                                     class="btn-close"
@@ -225,7 +225,7 @@ const loadData = async () => {
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <h6>Tanggal Penjualan</h6>
+                                    <h6>Tanggal Pengeluaran</h6>
                                     <input
                                         id="date"
                                         class="form-control form-control-lg mb-3"

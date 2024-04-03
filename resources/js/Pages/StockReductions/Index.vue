@@ -13,7 +13,7 @@ const setupEventListeners = () => {
         e.preventDefault();
         const userId = $(this).data("user-id");
         router.get(
-            route("purchases.edit", { id: userId }),
+            route("stock-reduction.edit", { id: userId }),
             {},
             { preserveState: true }
         );
@@ -34,7 +34,7 @@ const setupEventListeners = () => {
         }).then((result) => {
             if (result.isConfirmed) {
                 axios
-                    .delete(route("purchases.destroy", { id: userId }))
+                    .delete(route("stock-reduction.destroy", { id: userId }))
                     .then((response) => {
                         Swal.fire("Berhasil dihapus!", "", "success");
                         datatable.ajax.reload(null, false);
@@ -82,17 +82,12 @@ const loadData = async () => {
                 [5, 10, 50, "All"],
             ],
             ajax: {
-                url: route("purchases.loadDatatables"),
+                url: route("stock-reduction.loadDatatables"),
             },
             columns: [
-                { data: "date" },
+                { data: "stock_reduction_date" },
                 { data: "warehouse.name" },
-                {
-                    data: "total_amount",
-                    render: function (data, type, row) {
-                        return formatCurrency(data);
-                    },
-                },
+                { data: "total_products" },
                 {
                     data: null,
                     render: function (data, type, row) {
@@ -102,7 +97,6 @@ const loadData = async () => {
                                     <i class="fas fa-ellipsis-v"></i>
                                 </button>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <a class="dropdown-item edit-link" href="#" data-user-id="${row.id}">Edit</a>
                                     <a class="dropdown-item delete-link" href="#" data-user-id="${row.id}">Hapus</a>
                                 </div>
                             </div>
@@ -124,7 +118,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <Head title="Pemasukan" />
+    <Head title="Penyusutan" />
 
     <AuthenticatedLayout>
         <div class="row">
@@ -132,7 +126,7 @@ onMounted(() => {
                 <div class="page-title-box">
                     <div class="row">
                         <div class="col align-self-center">
-                            <h4 class="page-title pb-md-0">Pemasukan</h4>
+                            <h4 class="page-title pb-md-0">Penyusutan</h4>
                         </div>
                         <!--end col-->
                         <div class="col-auto align-self-center">
@@ -141,7 +135,7 @@ onMounted(() => {
                                     <a href="javascript:void(0);">Dashboard</a>
                                 </li>
                                 <li class="breadcrumb-item active">
-                                    Pemasukan
+                                    Penyusutan
                                 </li>
                             </ol>
                         </div>
@@ -161,7 +155,7 @@ onMounted(() => {
                         <div class="text-end">
                             <!-- <h5 class="card-title">Periode</h5> -->
                             <Link
-                                :href="route('purchases.create')"
+                                :href="route('stock-reduction.create')"
                                 class="btn btn-primary btn-icon-square-sm"
                                 ><i class="fas fa-plus-circle"></i
                             ></Link>
@@ -178,10 +172,10 @@ onMounted(() => {
                                 <thead class="">
                                     <tr>
                                         <th style="max-width: 250px">
-                                            Tanggal Pemasukan
+                                            Tanggal Penyusutan
                                         </th>
                                         <th>Gudang</th>
-                                        <th>Total Harga</th>
+                                        <th>Jumlah Produk</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>

@@ -6,11 +6,9 @@ import { Modal } from "momentum-modal";
 import Swal from "sweetalert2";
 import { format } from "date-fns";
 import CurrencyInput from "@/Components/CurrencyInput.vue";
+import accounting from "accounting";
 
 const props = defineProps({
-    data: {
-        type: Object,
-    },
     warehouses: {
         type: Object,
     },
@@ -20,19 +18,19 @@ const props = defineProps({
 });
 
 const form = useForm({
-    date: format(props.data.date, "dd/MM/yyyy"),
+    stock_reduction_date: format(new Date(), "dd/MM/yyyy"),
     warehouse_id: "",
-    total_amount: 0,
+    total_products: 0,
     sale_details: [],
-    ...props.data,
 });
 
 const submit = () => {
-    form.put(route("sales.update", { id: props.data.id }), {
+    form.post(route("stock-reduction.store"), {
         onFinish: () => {
             // form.reset('password', 'password_confirmation');
         },
         onSuccess: () => {
+            form.reset();
             Swal.fire({
                 title: "Berhasil disimpan!",
                 icon: "success",
@@ -45,21 +43,20 @@ const submit = () => {
 const product_id = ref("");
 let selectrWarehouse;
 let selectrProduct;
+let datatable;
+let modal;
 
-const addProduct = (id) => {
-    const product = props.products.find((value) => value.id === id);
+const addProduct = (product) => {
     const tempSaleDetails = [...form.sale_details];
     tempSaleDetails.push({
         id: "",
         product: product,
         product_id: product.id,
         quantity: 0,
-        unitcost: 0,
-        total: 0,
+        description: "",
     });
     form.sale_details = tempSaleDetails;
-    product_id.value = "";
-    selectrProduct.deselect();
+    console.log(tempSaleDetails);
 };
 
 const removeProduct = (index) => {
@@ -68,43 +65,118 @@ const removeProduct = (index) => {
     form.sale_details = tempSaleDetails;
 };
 
-const totalAmount = computed(() => {
+// const totalAmount = computed(() => {
+//     let total = 0;
+//     form.sale_details.forEach((detail) => {
+//         total += detail.total;
+//     });
+//     return total;
+// });
+
+const totalProducts = computed(() => {
     let total = 0;
     form.sale_details.forEach((detail) => {
-        total += parseFloat(detail.total);
+        total += detail.quantity;
     });
     return total;
 });
 
 watchEffect(() => {
-    form.total_amount = totalAmount.value;
+    form.total_products = totalProducts.value;
+    // form.total = totalAmount.value;
 });
 
 watch(
     () => form.sale_details,
     (newValue, oldValue) => {
-        newValue.forEach((detail, index) => {
-            const total = detail.quantity * detail.unitcost;
-            form.sale_details[index].total = total;
-        });
+        // newValue.forEach((detail, index) => {
+        //     const total = detail.quantity * detail.unitcost;
+        //     form.sale_details[index].total = total;
+        // });
     },
     { deep: true }
 );
 
-onMounted(() => {
-    selectrWarehouse = new Selectr("#warehouse");
+const formatCurrency = (value) => {
+    const decimalCount = (value.toString().split(".")[1] || "").length;
+    return accounting.formatMoney(value, {
+        symbol: "", // Tidak menampilkan simbol mata uang
+        precision: decimalCount || 0, // Menampilkan 2 angka di belakang koma
+        thousand: ",", // Menyusun ribuan dengan titik
+        decimal: ".", // Menyusun desimal dengan koma
+    });
+};
 
-    selectrProduct = new Selectr("#product");
+onMounted(() => {
+    // selectrWarehouse = new Selectr("#warehouse");
+
+    // selectrProduct = new Selectr("#product");
 
     var elem = document.querySelector("#date");
     new Datepicker(elem, {
         format: "dd/mm/yyyy",
     });
+
+    loadData();
+
+    events = document.getElementById("modalProducts");
+    events.addEventListener("show.bs.modal", redrawDataTable);
+
+    modal = new bootstrap.Modal(events);
 });
+
+const redrawDataTable = () => {
+    if (datatable) {
+        datatable.ajax.reload(null, false);
+    }
+};
+
+const loadData = async () => {
+    try {
+        datatable = $("#datatables").DataTable({
+            // responsive: true,
+            select: true,
+            lengthMenu: [
+                [5, 10, 50, -1],
+                [5, 10, 50, "All"],
+            ],
+            ajax: {
+                url: route("products.loadDatatables"),
+                data: function (d) {
+                    d.warehouse_id = form.warehouse_id;
+                    d.product_ids = form.sale_details.map(
+                        (detail) => detail.product_id
+                    );
+                },
+            },
+            columns: [
+                { data: "name" },
+                { data: "unit" },
+                { data: "stock" },
+                {
+                    data: "unitcost",
+                    render: function (data, type, row) {
+                        return formatCurrency(data);
+                    },
+                },
+            ],
+        });
+
+        datatable.on("select", function (e, dt, type, indexes) {
+            let rowData = datatable.rows(indexes).data();
+            addProduct(rowData[0]);
+            modal.hide();
+        });
+
+        // setupEventListeners();
+    } catch (error) {
+        console.error("Gagal memuat data:", error);
+    }
+};
 </script>
 
 <template>
-    <Head title="Pengeluaran" />
+    <Head title="Penyusutan" />
 
     <AuthenticatedLayout>
         <div class="row">
@@ -112,7 +184,7 @@ onMounted(() => {
                 <div class="page-title-box">
                     <div class="row">
                         <div class="col align-self-center">
-                            <h4 class="page-title pb-md-0">Pengeluaran</h4>
+                            <h4 class="page-title pb-md-0">Penyusutan</h4>
                         </div>
                         <!--end col-->
                         <div class="col-auto align-self-center">
@@ -121,7 +193,7 @@ onMounted(() => {
                                     <a href="javascript:void(0);">Dashboard</a>
                                 </li>
                                 <li class="breadcrumb-item active">
-                                    Pengeluaran
+                                    Penyusutan
                                 </li>
                             </ol>
                         </div>
@@ -140,9 +212,9 @@ onMounted(() => {
                     <div class="card">
                         <div class="card-header py-3">
                             <div class="d-flex justify-content-between">
-                                <h5 class="card-title">Create Sale</h5>
+                                <h5 class="card-title">Penyusutan Baru</h5>
                                 <Link
-                                    :href="route('sales.index')"
+                                    :href="route('stock-reduction.index')"
                                     class="btn-close"
                                 ></Link>
                             </div>
@@ -151,23 +223,25 @@ onMounted(() => {
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <h6>Sale Date</h6>
+                                    <h6>Tanggal Penyusutan</h6>
                                     <input
                                         id="date"
-                                        class="form-control mb-3"
+                                        class="form-control form-control-lg mb-3"
                                         :class="{
-                                            'is-invalid': form.errors.date,
+                                            'is-invalid':
+                                                form.errors
+                                                    .stock_reduction_date,
                                         }"
                                         type="text"
-                                        v-model="form.date"
+                                        v-model="form.stock_reduction_date"
                                     />
                                     <div class="invalid-feedback">
-                                        {{ form.errors.date }}
+                                        {{ form.errors.stock_reduction_date }}
                                     </div>
                                 </div>
                                 <!-- end col -->
                                 <div class="col-md-6">
-                                    <h6>Warehouse</h6>
+                                    <h6>Gudang</h6>
                                     <div
                                         class="form-group"
                                         :class="{
@@ -176,9 +250,16 @@ onMounted(() => {
                                         }"
                                     >
                                         <select
-                                            id="warehouse"
+                                            class="form-select form-select-lg"
+                                            :class="{
+                                                'is-invalid':
+                                                    form.errors.warehouse_id,
+                                            }"
                                             v-model="form.warehouse_id"
                                         >
+                                            <option value="">
+                                                Pilih gudang...
+                                            </option>
                                             <option
                                                 v-for="warehouse in warehouses"
                                                 :value="warehouse.id"
@@ -200,42 +281,33 @@ onMounted(() => {
                             <!-- end row -->
 
                             <div v-if="form.warehouse_id">
-                                <div class="row">
+                                <div class="row mt-2">
                                     <div class="col-md-12">
-                                        <h6>Product</h6>
-                                        <select
-                                            id="product"
-                                            v-model="product_id"
-                                            @change="addProduct(product_id)"
-                                        >
-                                            <option
-                                                v-for="product in products"
-                                                :value="product.id"
-                                                :key="product.id"
+                                        <div class="text-end">
+                                            <button
+                                                type="button"
+                                                class="btn btn-de-dashed-primary btn-lg mb-3"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalProducts"
                                             >
-                                                {{ product.name }}
-                                            </option>
-                                        </select>
-                                    </div>
-                                    <!-- end col -->
-                                </div>
-                                <!-- end row -->
-
-                                <div class="row mt-4">
-                                    <div class="col-md-12">
+                                                <i
+                                                    class="fas fa-plus-circle"
+                                                ></i>
+                                                Produk
+                                            </button>
+                                        </div>
                                         <div class="table-responsive">
                                             <table
                                                 class="table table-bordered mb-0"
                                             >
                                                 <thead class="table-light">
                                                     <tr>
-                                                        <th>Name</th>
+                                                        <th>Nama</th>
                                                         <th>Stock</th>
-                                                        <th>Quantity</th>
-                                                        <th>Price</th>
-                                                        <th>Total</th>
+                                                        <th>Jumlah</th>
+                                                        <th>Keterangan</th>
                                                         <th class="text-center">
-                                                            Action
+                                                            Aksi
                                                         </th>
                                                     </tr>
                                                 </thead>
@@ -269,7 +341,7 @@ onMounted(() => {
                                                                 disabled
                                                                 v-model="
                                                                     form
-                                                                        .purchase_details[
+                                                                        .sale_details[
                                                                         index
                                                                     ].product
                                                                         .stock
@@ -277,28 +349,46 @@ onMounted(() => {
                                                             />
                                                         </td>
                                                         <td>
-                                                            <CurrencyInput
-                                                                class="form-control"
-                                                                :class="{
-                                                                    'is-invalid':
+                                                            <div
+                                                                class="input-group"
+                                                            >
+                                                                <CurrencyInput
+                                                                    class="form-control"
+                                                                    :class="{
+                                                                        'is-invalid':
+                                                                            form
+                                                                                .errors[
+                                                                                'sale_details.' +
+                                                                                    index +
+                                                                                    '.quantity'
+                                                                            ],
+                                                                    }"
+                                                                    type="text"
+                                                                    v-model="
                                                                         form
-                                                                            .errors[
-                                                                            'sale_details.' +
-                                                                                index +
-                                                                                '.quantity'
-                                                                        ],
-                                                                }"
-                                                                type="text"
-                                                                v-model="
-                                                                    form
-                                                                        .sale_details[
-                                                                        index
-                                                                    ].quantity
-                                                                "
-                                                            />
+                                                                            .sale_details[
+                                                                            index
+                                                                        ]
+                                                                            .quantity
+                                                                    "
+                                                                />
+                                                                <span
+                                                                    class="input-group-text"
+                                                                    id="basic-addon2"
+                                                                    >{{
+                                                                        form
+                                                                            .sale_details[
+                                                                            index
+                                                                        ]
+                                                                            .product
+                                                                            .unit
+                                                                    }}</span
+                                                                >
+                                                            </div>
                                                         </td>
+
                                                         <td>
-                                                            <CurrencyInput
+                                                            <input
                                                                 class="form-control"
                                                                 :class="{
                                                                     'is-invalid':
@@ -306,7 +396,7 @@ onMounted(() => {
                                                                             .errors[
                                                                             'sale_details.' +
                                                                                 index +
-                                                                                '.unitcost'
+                                                                                '.description'
                                                                         ],
                                                                 }"
                                                                 type="text"
@@ -314,32 +404,12 @@ onMounted(() => {
                                                                     form
                                                                         .sale_details[
                                                                         index
-                                                                    ].unitcost
+                                                                    ]
+                                                                        .description
                                                                 "
                                                             />
                                                         </td>
-                                                        <td>
-                                                            <CurrencyInput
-                                                                class="form-control"
-                                                                :class="{
-                                                                    'is-invalid':
-                                                                        form
-                                                                            .errors[
-                                                                            'sale_details.' +
-                                                                                index +
-                                                                                '.total'
-                                                                        ],
-                                                                }"
-                                                                type="text"
-                                                                disabled
-                                                                v-model="
-                                                                    form
-                                                                        .sale_details[
-                                                                        index
-                                                                    ].total
-                                                                "
-                                                            />
-                                                        </td>
+
                                                         <td class="text-center">
                                                             <a
                                                                 href="#"
@@ -359,7 +429,7 @@ onMounted(() => {
                                                             colspan="3"
                                                             class="text-end"
                                                         >
-                                                            Total Price
+                                                            Total Produk
                                                         </th>
                                                         <td>
                                                             <CurrencyInput
@@ -368,11 +438,11 @@ onMounted(() => {
                                                                     'is-invalid':
                                                                         form
                                                                             .errors
-                                                                            .total_amount,
+                                                                            .total_products,
                                                                 }"
                                                                 type="text"
                                                                 v-model="
-                                                                    form.total_amount
+                                                                    form.total_products
                                                                 "
                                                                 disabled
                                                             />
@@ -394,7 +464,7 @@ onMounted(() => {
                                     class="btn btn-primary btn-lg w-100 h-45 mt-4"
                                     :disabled="form.processing"
                                 >
-                                    Submit
+                                    Simpan
                                 </button>
                             </div>
                         </div>
@@ -405,6 +475,66 @@ onMounted(() => {
             <!-- end row -->
         </form>
 
-        <Modal :redrawDataTable="redrawDataTable" />
+        <div
+            class="modal fade"
+            id="modalProducts"
+            tabindex="-1"
+            role="dialog"
+            aria-labelledby="modalProductsLabel"
+            aria-hidden="true"
+        >
+            <div
+                class="modal-dialog modal-lg modal-dialog-centered"
+                role="document"
+            >
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h6 class="modal-title m-0" id="modalProductsLabel">
+                            Default Modal
+                        </h6>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                        ></button>
+                    </div>
+                    <!--end modal-header-->
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table
+                                class="table"
+                                id="datatables"
+                                style="width: 100%"
+                            >
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Unit</th>
+                                        <th>Stock</th>
+                                        <th>Harga</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!--end modal-body-->
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-de-secondary btn-sm"
+                            data-bs-dismiss="modal"
+                        >
+                            Close
+                        </button>
+                    </div>
+                    <!--end modal-footer-->
+                </div>
+                <!--end modal-content-->
+            </div>
+            <!--end modal-dialog-->
+        </div>
+        <!--end modal-->
     </AuthenticatedLayout>
 </template>

@@ -167,7 +167,7 @@ const showingNavigationDropdown = ref(false);
                             >
                                 <span
                                     ><i class="ti ti-planet menu-icon"></i
-                                    >Pembelian</span
+                                    >Pemasukan</span
                                 >
                             </Link>
                         </li>
@@ -181,7 +181,21 @@ const showingNavigationDropdown = ref(false);
                             >
                                 <span
                                     ><i class="ti ti-file-diff menu-icon"></i
-                                    >Penjualan</span
+                                    >Pengeluaran</span
+                                >
+                            </Link>
+                        </li>
+                        <!--end nav-item-->
+
+                        <li class="nav-item">
+                            <Link
+                                class="nav-link"
+                                :href="route('stock-reduction.index')"
+                                id="navbarPages"
+                            >
+                                <span
+                                    ><i class="ti ti-file-diff menu-icon"></i
+                                    >Penyusutan</span
                                 >
                             </Link>
                         </li>

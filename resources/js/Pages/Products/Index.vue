@@ -67,8 +67,8 @@ const loadData = async () => {
                 searchPlaceholder: "Search..",
             },
             lengthMenu: [
-                [5, 10, 50, -1],
-                [5, 10, 50, "All"],
+                [10, 50, -1],
+                [10, 50, "All"],
             ],
             ajax: {
                 url: route("products.loadDatatables"),

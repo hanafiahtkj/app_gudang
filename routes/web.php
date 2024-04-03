@@ -11,6 +11,7 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\NilaiController;
 use App\Http\Controllers\LabaController;
+use App\Http\Controllers\StockReductionController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -75,6 +76,10 @@ Route::middleware('auth')->group(function () {
     Route::get('laba/loadDatatables', [LabaController::class, 'loadDatatables'])->name('laba.loadDatatables');
     Route::get('laba/loadProsesData', [LabaController::class, 'loadProsesData'])->name('laba.loadProsesData');
     Route::resource('laba', LabaController::class);
+
+    Route::get('stock-reduction/loadDatatables', [StockReductionController::class, 'loadDatatables'])->name('stock-reduction.loadDatatables');
+    Route::get('stock-reduction/modalProducts', [StockReductionController::class, 'modalProducts'])->name('stock-reduction.modalProducts');
+    Route::resource('stock-reduction', StockReductionController::class);
 });
 
 

@@ -108,7 +108,7 @@ const props = defineProps({
                                 <h6
                                     class="text-uppercase text-muted mt-2 m-0 font-11"
                                 >
-                                    Pembelian
+                                    Pemasukan
                                 </h6>
                             </div>
                             <!--end col-->
@@ -135,7 +135,7 @@ const props = defineProps({
                                 <h6
                                     class="text-uppercase text-muted mt-2 m-0 font-11"
                                 >
-                                    Penjualan
+                                    Pengeluaran
                                 </h6>
                             </div>
                             <!--end col-->

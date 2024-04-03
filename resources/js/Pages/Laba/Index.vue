@@ -450,11 +450,11 @@ watch(
                     <div class="card-body">
                         <div class="table-responsive">
                             <table
-                                class="table table-striped"
+                                class="table"
                                 id="datatables"
                                 style="width: 100%"
                             >
-                                <thead class="">
+                                <thead class="thead-light">
                                     <tr>
                                         <th>Tanggal</th>
                                         <th>Penjualan</th>

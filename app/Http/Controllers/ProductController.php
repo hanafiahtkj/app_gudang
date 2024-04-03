@@ -36,17 +36,25 @@ class ProductController extends Controller
             ->select('sale_details.product_id', 'sales.warehouse_id', DB::raw('SUM(sale_details.quantity) as total_sale'))
             ->groupBy('sale_details.product_id', 'sales.warehouse_id');
 
+        $reductionQuery = DB::table('stock_reduction_details')
+            ->join('stock_reductions', 'stock_reduction_details.stock_reduction_id', '=', 'stock_reductions.id')
+            ->select('stock_reduction_details.product_id', 'stock_reductions.warehouse_id', DB::raw('SUM(stock_reduction_details.quantity) as total_stock_reductions'))
+            ->groupBy('stock_reduction_details.product_id', 'stock_reductions.warehouse_id');
+
         $model = Product::leftJoinSub($purchaseQuery, 'purchases', function ($join) {
                 $join->on('products.id', '=', 'purchases.product_id');
             })
             ->leftJoinSub($saleQuery, 'sales', function ($join) {
                 $join->on('products.id', '=', 'sales.product_id');
             })
+            ->leftJoinSub($reductionQuery, 'stockreductions', function ($join) {
+                $join->on('products.id', '=', 'stockreductions.product_id');
+            })
             ->leftJoinSub($latestUnitCostSubQuery, 'unitcosts', function ($join) {
                 $join->on('products.id', '=', 'unitcosts.product_id');
             })
             ->select('products.*',
-                    DB::raw('COALESCE(purchases.total_purchase, 0) - COALESCE(sales.total_sale, 0) as stock'),
+                    DB::raw('COALESCE(purchases.total_purchase, 0) - COALESCE(sales.total_sale, 0) - COALESCE(stockreductions.total_stock_reductions, 0) as stock'),
                     'unitcosts.unitcost as unitcost');
 
         if ($request->has('warehouse_id')) {

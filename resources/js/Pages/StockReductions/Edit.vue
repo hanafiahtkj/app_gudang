@@ -28,7 +28,7 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.put(route("sales.update", { id: props.data.id }), {
+    form.put(route("stock-reduction.update", { id: props.data.id }), {
         onFinish: () => {
             // form.reset('password', 'password_confirmation');
         },
@@ -104,7 +104,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <Head title="Pengeluaran" />
+    <Head title="Penyusutan" />
 
     <AuthenticatedLayout>
         <div class="row">
@@ -112,7 +112,7 @@ onMounted(() => {
                 <div class="page-title-box">
                     <div class="row">
                         <div class="col align-self-center">
-                            <h4 class="page-title pb-md-0">Pengeluaran</h4>
+                            <h4 class="page-title pb-md-0">Penyusutan</h4>
                         </div>
                         <!--end col-->
                         <div class="col-auto align-self-center">
@@ -121,7 +121,7 @@ onMounted(() => {
                                     <a href="javascript:void(0);">Dashboard</a>
                                 </li>
                                 <li class="breadcrumb-item active">
-                                    Pengeluaran
+                                    Penyusutan
                                 </li>
                             </ol>
                         </div>
@@ -142,7 +142,7 @@ onMounted(() => {
                             <div class="d-flex justify-content-between">
                                 <h5 class="card-title">Create Sale</h5>
                                 <Link
-                                    :href="route('sales.index')"
+                                    :href="route('stock-reduction.index')"
                                     class="btn-close"
                                 ></Link>
                             </div>
