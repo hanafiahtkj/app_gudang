@@ -75,8 +75,9 @@ const loadData = async () => {
             },
             columns: [
                 { data: "name" },
-                { data: "unit" },
+
                 { data: "stock" },
+                { data: "unit" },
                 { data: "description" },
                 {
                     data: null,
@@ -162,8 +163,8 @@ onMounted(() => {
                                 <thead class="">
                                     <tr>
                                         <th>Nama Produk</th>
-                                        <th>Unit</th>
                                         <th>Stock</th>
+                                        <th>Unit</th>
                                         <th>Keterangan</th>
                                         <th>Aksi</th>
                                     </tr>
