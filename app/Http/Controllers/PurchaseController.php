@@ -88,7 +88,13 @@ class PurchaseController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $data = Purchase::with(['warehouse', 'purchaseDetails', 'purchaseDetails.product'])->where('id', $id)->first();
+        return Inertia::modal('Purchases/Show', [
+            'data' => $data,
+            'warehouses' => Warehouse::all(),
+            'products' => Product::all(),
+        ])
+        ->baseRoute('purchases.index');
     }
 
     /**
@@ -98,10 +104,10 @@ class PurchaseController extends Controller
     {
         $data = Purchase::with(['purchaseDetails', 'purchaseDetails.product'])->where('id', $id)->first();
         return Inertia::render('Purchases/Edit', [
-                'data' => $data,
-                'warehouses' => Warehouse::all(),
-                'products' => Product::all(),
-            ]);
+            'data' => $data,
+            'warehouses' => Warehouse::all(),
+            'products' => Product::all(),
+        ]);
     }
 
     /**

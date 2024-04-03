@@ -90,7 +90,13 @@ class StockReductionController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $data = StockReduction::with(['warehouse', 'stockReductionDetails', 'stockReductionDetails.product'])->where('id', $id)->first();
+        return Inertia::modal('StockReductions/Show', [
+            'data' => $data,
+            'warehouses' => Warehouse::all(),
+            'products' => Product::all(),
+        ])
+        ->baseRoute('stock-reduction.index');
     }
 
     /**

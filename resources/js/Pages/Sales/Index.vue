@@ -9,6 +9,16 @@ import accounting from "accounting";
 let datatable;
 
 const setupEventListeners = () => {
+    $(document).on("click", ".show-link", function (e) {
+        e.preventDefault();
+        const userId = $(this).data("user-id");
+        router.get(
+            route("sales.show", { id: userId }),
+            {},
+            { preserveState: true }
+        );
+    });
+
     $(document).on("click", ".edit-link", function (e) {
         e.preventDefault();
         const userId = $(this).data("user-id");
@@ -103,6 +113,7 @@ const loadData = async () => {
                                     <i class="fas fa-ellipsis-v"></i>
                                 </button>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item show-link" href="#" data-user-id="${row.id}">Detail</a>
                                     <a class="dropdown-item delete-link" href="#" data-user-id="${row.id}">Hapus</a>
                                 </div>
                             </div>

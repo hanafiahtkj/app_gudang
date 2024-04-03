@@ -48,6 +48,17 @@ let selectrProduct;
 
 const addProduct = (id) => {
     const product = props.products.find((value) => value.id === id);
+
+    // Periksa apakah produk sudah ada di dalam purchase_details
+    const existingProductIndex = form.purchase_details.findIndex(
+        (detail) => detail.product_id === id
+    );
+    if (existingProductIndex !== -1) {
+        // Produk sudah ada, maka tidak perlu menambahkannya lagi
+        console.log("Product already exists in purchase details.");
+        return;
+    }
+
     const tempPurchaseDetails = [...form.purchase_details];
     tempPurchaseDetails.push({
         id: "",
@@ -92,7 +103,7 @@ watch(
 );
 
 onMounted(() => {
-    selectrWarehouse = new Selectr("#warehouse");
+    // selectrWarehouse = new Selectr("#warehouse");
 
     selectrProduct = new Selectr("#product");
 
@@ -154,7 +165,7 @@ onMounted(() => {
                                     <h6>Tanggal Pemasukan</h6>
                                     <input
                                         id="date"
-                                        class="form-control mb-3"
+                                        class="form-control form-control-lg mb-3"
                                         :class="{
                                             'is-invalid': form.errors.date,
                                         }"
@@ -176,9 +187,16 @@ onMounted(() => {
                                         }"
                                     >
                                         <select
-                                            id="warehouse"
+                                            class="form-select form-select-lg"
+                                            :class="{
+                                                'is-invalid':
+                                                    form.errors.warehouse_id,
+                                            }"
                                             v-model="form.warehouse_id"
                                         >
+                                            <option value="">
+                                                Pilih gudang...
+                                            </option>
                                             <option
                                                 v-for="warehouse in warehouses"
                                                 :value="warehouse.id"
@@ -201,7 +219,7 @@ onMounted(() => {
 
                             <div class="row">
                                 <div class="col-md-12">
-                                    <h6>Produk</h6>
+                                    <h6>Cari Produk</h6>
                                     <select
                                         id="product"
                                         v-model="product_id"

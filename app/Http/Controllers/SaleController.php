@@ -90,7 +90,13 @@ class SaleController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $data = Sale::with(['warehouse', 'saleDetails', 'saleDetails.product'])->where('id', $id)->first();
+        return Inertia::modal('Sales/Show', [
+            'data' => $data,
+            'warehouses' => Warehouse::all(),
+            'products' => Product::all(),
+        ])
+        ->baseRoute('sales.index');
     }
 
     /**
