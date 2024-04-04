@@ -1,118 +1,452 @@
 <script setup>
-import Swal from "sweetalert2";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { useModal } from "momentum-modal";
-import { Head, Link, useForm, router, usePage } from "@inertiajs/vue3";
-import { ref, onMounted } from "vue";
-
-const { show, close, redirect } = useModal();
+import { ref, onMounted, watch } from "vue";
+import { Head, Link, router, useForm } from "@inertiajs/vue3";
+import { Modal } from "momentum-modal";
+import Swal from "sweetalert2";
+import { format } from "date-fns";
+import CurrencyInput from "@/Components/CurrencyInput.vue";
+import accounting from "accounting";
 
 const props = defineProps({
+    nilai: {
+        type: Object,
+    },
     data: {
         type: Object,
     },
-    redrawDataTable: {
-        type: Function,
-    },
 });
 
-let modal;
-let events;
+let datatable;
+const bulantahun = ref(format(new Date(), "MM/yyyy"));
+
+const formEdit = ref(true);
 
 const form = useForm({
-    name: "",
-    ...props.data,
+    tanggal: format(new Date(), "dd/MM/yyyy"),
+    penjualan: 0,
+    pengeluaran: 0,
+    laba: 0,
+    persen_pemilik: props.nilai.persen_pemilik ?? 0,
+    persen_karyawan: props.nilai.persen_karyawan ?? 0,
+    laba_pemilik: 0,
+    laba_karyawan: 0,
 });
 
 const submit = () => {
-    form.put(route("categories.update", { id: props.data.id }), {
+    form.post(route("laba.store"), {
         onFinish: () => {
             // form.reset('password', 'password_confirmation');
         },
         onSuccess: () => {
+            // formEdit.value = false;
             Swal.fire({
                 title: "Berhasil disimpan!",
                 icon: "success",
                 showCloseButton: true,
             });
-            events.addEventListener("hidden.bs.modal", (event) => {
-                props.redrawDataTable();
-            });
-            modal.hide();
+            redrawDataTable();
         },
     });
 };
 
-onMounted(() => {
-    modal = new bootstrap.Modal(document.getElementById("inlineForm"));
-    modal.show();
+const setupEventListeners = () => {
+    $(document).on("click", ".edit-link", function (e) {
+        e.preventDefault();
+        const userId = $(this).data("user-id");
+        router.get(
+            route("categories.edit", { id: userId }),
+            {},
+            { preserveState: true }
+        );
+    });
 
-    events = document.getElementById("inlineForm");
-    events.addEventListener("hidden.bs.modal", redirect);
+    $(document).on("click", ".delete-link", function (e) {
+        e.preventDefault();
+        const userId = $(this).data("user-id");
+
+        Swal.fire({
+            title: "Yakin ingin menghapus?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            cancelButtonColor: "#d33",
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios
+                    .delete(route("categories.destroy", { id: userId }))
+                    .then((response) => {
+                        Swal.fire("Berhasil dihapus!", "", "success");
+                        datatable.ajax.reload(null, false);
+                    })
+                    .catch((error) => {
+                        console.error("Failed to delete user:", error);
+                    });
+            }
+        });
+    });
+};
+
+const formatCurrency = (value) => {
+    const decimalCount = (value.toString().split(".")[1] || "").length;
+    return accounting.formatMoney(value, {
+        symbol: "", // Tidak menampilkan simbol mata uang
+        precision: decimalCount || 0, // Menampilkan 2 angka di belakang koma
+        thousand: ",", // Menyusun ribuan dengan titik
+        decimal: ".", // Menyusun desimal dengan koma
+    });
+};
+
+const redrawDataTable = () => {
+    if (datatable) {
+        datatable.ajax.reload(null, false);
+    }
+};
+
+const loadData = async () => {
+    try {
+        datatable = $("#datatables").DataTable({
+            responsive: true,
+            dom:
+                "<'row'<'col-3'l><'col-9'f>>" +
+                "<'row dt-row'<'col-sm-12'tr>>" +
+                "<'row'<'col-4'i><'col-8'p>>",
+            language: {
+                info: "Page _PAGE_ of _PAGES_",
+                lengthMenu: "_MENU_ ",
+                search: "",
+                searchPlaceholder: "Search..",
+            },
+            lengthMenu: [
+                [5, 10, 50, -1],
+                [5, 10, 50, "All"],
+            ],
+            ajax: {
+                url: route("laba.loadDatatables"),
+                data: function (d) {
+                    d.bulantahun = bulantahun.value;
+                },
+            },
+            columns: [
+                { data: "tanggal" },
+                {
+                    data: "penjualan",
+                    render: function (data, type, row) {
+                        return formatCurrency(data);
+                    },
+                },
+                {
+                    data: "pengeluaran",
+                    render: function (data, type, row) {
+                        return formatCurrency(data);
+                    },
+                },
+                {
+                    data: "laba",
+                    render: function (data, type, row) {
+                        return formatCurrency(data);
+                    },
+                },
+                {
+                    data: "laba_pemilik",
+                    render: function (data, type, row) {
+                        return formatCurrency(data);
+                    },
+                },
+                {
+                    data: "laba_karyawan",
+                    render: function (data, type, row) {
+                        return formatCurrency(data);
+                    },
+                },
+            ],
+        });
+
+        setupEventListeners();
+    } catch (error) {
+        console.error("Gagal memuat data:", error);
+    }
+};
+
+const loadProsesData = async () => {
+    let tanggal = form.tanggal;
+    if (tanggal) {
+        let url = route("laba.loadProsesData");
+        url = url + `?tanggal=${tanggal}`;
+        const response = await axios.get(url);
+        if (response.status === 200) {
+            const data = response.data.proses;
+            console.log(data);
+            if (data) {
+                const { tanggal: tanggalData, ...restData } = data; // Membongkar tanggal dari data
+                Object.assign(form, restData); // Mengganti nilai-nilai selain tanggal
+            } else {
+                form.reset();
+                form.tanggal = tanggal;
+            }
+        }
+    }
+};
+
+onMounted(() => {
+    // loadData();
+
+    form.tanggal = format(props.data.tanggal, "dd/MM/yyyy");
+
+    loadProsesData();
+
+    var elem = document.querySelector("#date");
+    new Datepicker(elem, {
+        format: "dd/mm/yyyy",
+    });
+
+    elem.addEventListener("changeDate", (event) => {
+        form.tanggal = event.target.value;
+        loadProsesData();
+    });
 });
+
+watch(
+    () => form.penjualan,
+    (newValue, oldValue) => {
+        const total = newValue - form.pengeluaran;
+        form.laba = total;
+    }
+);
+
+watch(
+    () => form.laba,
+    (newValue, oldValue) => {
+        form.laba_pemilik = (form.persen_pemilik / 100) * newValue;
+        form.laba_karyawan = (form.persen_karyawan / 100) * newValue;
+    }
+);
 </script>
 
 <template>
-    <form @submit.prevent="submit" autocomplete="off" novalidate>
-        <div
-            class="modal fade text-left"
-            id="inlineForm"
-            tabindex="-1"
-            aria-labelledby="myModalLabel33"
-            aria-hidden="true"
-            style="display: none"
-        >
-            <div
-                class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
-                role="document"
-            >
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" id="myModalLabel33">Edit</h4>
-                        <button
-                            type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Close"
-                        ></button>
+    <Head title="Dashboard" />
+
+    <AuthenticatedLayout>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="page-title-box">
+                    <div class="row">
+                        <div class="col align-self-center">
+                            <h4 class="page-title pb-md-0">Laba</h4>
+                        </div>
+                        <!--end col-->
+                        <div class="col-auto align-self-center">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item">
+                                    <a href="javascript:void(0);">Dashboard</a>
+                                </li>
+                                <li class="breadcrumb-item active">Laba</li>
+                            </ol>
+                        </div>
+                        <!--end col-->
                     </div>
-                    <div class="modal-body">
-                        <h6>Name</h6>
-                        <div class="form-group">
-                            <input
-                                type="text"
-                                placeholder=""
-                                class="form-control"
-                                :class="{ 'is-invalid': form.errors.name }"
-                                v-model="form.name"
-                                autocomplete="off"
-                            />
-                            <div class="invalid-feedback">
-                                {{ form.errors.name }}
+                    <!--end row-->
+                </div>
+                <!--end page-title-box-->
+            </div>
+            <!--end col-->
+        </div>
+
+        <form @submit.prevent="submit" autocomplete="off" novalidate>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header py-3">
+                            <div class="d-flex justify-content-between">
+                                <h5 class="card-title">Form Laba</h5>
+                                <Link
+                                    :href="route('laba.index')"
+                                    class="btn-close"
+                                ></Link>
+                            </div>
+                        </div>
+                        <!--end card-header-->
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12">
+                                    <h6>Tanggal</h6>
+                                    <input
+                                        id="date"
+                                        class="form-control form-control-lg"
+                                        :class="{
+                                            'is-invalid': form.errors.tanggal,
+                                        }"
+                                        type="text"
+                                        v-model="form.tanggal"
+                                        disabled
+                                    />
+                                    <div class="invalid-feedback">
+                                        {{ form.errors.tanggal }}
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <h6>Penjualan</h6>
+                                    <CurrencyInput
+                                        class="form-control form-control-lg"
+                                        :class="{
+                                            'is-invalid': form.errors.penjualan,
+                                        }"
+                                        type="text"
+                                        v-model="form.penjualan"
+                                        :disabled="!formEdit"
+                                    />
+                                    <div class="invalid-feedback">
+                                        {{ form.errors.penjualan }}
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <h6>Pengeluaran</h6>
+                                    <CurrencyInput
+                                        class="form-control form-control-lg"
+                                        :class="{
+                                            'is-invalid':
+                                                form.errors.pengeluaran,
+                                        }"
+                                        type="text"
+                                        v-model="form.pengeluaran"
+                                        disabled
+                                    />
+                                    <div class="invalid-feedback">
+                                        {{ form.errors.pengeluaran }}
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <h6>Laba</h6>
+                                    <CurrencyInput
+                                        class="form-control form-control-lg"
+                                        :class="{
+                                            'is-invalid': form.errors.laba,
+                                        }"
+                                        type="text"
+                                        v-model="form.laba"
+                                        :disabled="!formEdit"
+                                    />
+                                    <div class="invalid-feedback">
+                                        {{ form.errors.laba }}
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="row">
+                                        <div class="col-2">
+                                            <h6>Persentase %</h6>
+                                            <input
+                                                class="form-control form-control-lg"
+                                                :class="{
+                                                    'is-invalid':
+                                                        form.errors
+                                                            .persen_pemilik,
+                                                }"
+                                                type="text"
+                                                v-model="form.persen_pemilik"
+                                                disabled
+                                            />
+                                            <div class="invalid-feedback">
+                                                {{ form.errors.persen_pemilik }}
+                                            </div>
+                                        </div>
+                                        <div class="col-10">
+                                            <h6>Laba Pemilik</h6>
+                                            <CurrencyInput
+                                                class="form-control form-control-lg"
+                                                :class="{
+                                                    'is-invalid':
+                                                        form.errors
+                                                            .laba_pemilik,
+                                                }"
+                                                type="text"
+                                                v-model="form.laba_pemilik"
+                                                :disabled="!formEdit"
+                                            />
+                                            <div class="invalid-feedback">
+                                                {{ form.errors.laba_pemilik }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-2">
+                                            <h6>Persentase %</h6>
+                                            <input
+                                                class="form-control form-control-lg"
+                                                :class="{
+                                                    'is-invalid':
+                                                        form.errors
+                                                            .persen_karyawan,
+                                                }"
+                                                type="text"
+                                                v-model="form.persen_karyawan"
+                                                disabled
+                                            />
+                                            <div class="invalid-feedback">
+                                                {{
+                                                    form.errors.persen_karyawan
+                                                }}
+                                            </div>
+                                        </div>
+                                        <div class="col-10">
+                                            <h6>Laba Karyawan</h6>
+                                            <CurrencyInput
+                                                class="form-control form-control-lg"
+                                                :class="{
+                                                    'is-invalid':
+                                                        form.errors
+                                                            .laba_karyawan,
+                                                }"
+                                                type="text"
+                                                v-model="form.laba_karyawan"
+                                                :disabled="!formEdit"
+                                            />
+                                            <div class="invalid-feedback">
+                                                {{ form.errors.laba_karyawan }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-end mt-3">
+                                <!-- <button
+                                    v-if="!formEdit"
+                                    type="button"
+                                    class="btn btn-secondary mt-2"
+                                    style="width: 100px"
+                                    @click="formEdit = true"
+                                >
+                                    Edit
+                                </button>
+                                <button
+                                    v-if="formEdit"
+                                    type="button"
+                                    class="btn btn-secondary mt-2 me-2"
+                                    style="width: 100px"
+                                    @click="formEdit = false"
+                                >
+                                    Batal
+                                </button> -->
+                                <button
+                                    v-if="formEdit"
+                                    type="submit"
+                                    class="btn btn-primary mt-2"
+                                    style="width: 100px"
+                                    :disabled="form.processing"
+                                >
+                                    Simpan
+                                </button>
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer" style="background-color: #f6f8fb">
-                        <button
-                            type="button"
-                            class="btn bg-white btn-outline-default border me-auto"
-                            data-bs-dismiss="modal"
-                            aria-label="Close"
-                        >
-                            <i class="bx bx-x d-block d-sm-none"></i>
-                            <span class="d-none d-sm-block">Close</span>
-                        </button>
-                        <button
-                            type="submit"
-                            class="btn btn-primary ms-1"
-                            :disabled="form.processing"
-                        >
-                            <i class="bx bx-check d-block d-sm-none"></i>
-                            <span class="d-none d-sm-block">Simpan</span>
-                        </button>
-                    </div>
                 </div>
+                <!-- end col -->
             </div>
-        </div>
-    </form>
+            <!-- end row -->
+        </form>
+
+        <Modal :redrawDataTable="redrawDataTable" />
+    </AuthenticatedLayout>
 </template>

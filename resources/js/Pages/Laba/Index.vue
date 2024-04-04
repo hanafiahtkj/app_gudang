@@ -52,7 +52,7 @@ const setupEventListeners = () => {
         e.preventDefault();
         const userId = $(this).data("user-id");
         router.get(
-            route("categories.edit", { id: userId }),
+            route("laba.edit", { id: userId }),
             {},
             { preserveState: true }
         );
@@ -73,7 +73,7 @@ const setupEventListeners = () => {
         }).then((result) => {
             if (result.isConfirmed) {
                 axios
-                    .delete(route("categories.destroy", { id: userId }))
+                    .delete(route("laba.destroy", { id: userId }))
                     .then((response) => {
                         Swal.fire("Berhasil dihapus!", "", "success");
                         datatable.ajax.reload(null, false);
@@ -158,6 +158,22 @@ const loadData = async () => {
                         return formatCurrency(data);
                     },
                 },
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        return `
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-icon btn-default me-1" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item edit-link" href="#" data-user-id="${row.id}">Edit</a>
+                                    <a class="dropdown-item delete-link" href="#" data-user-id="${row.id}">Hapus</a>
+                                </div>
+                            </div>
+                        `;
+                    },
+                },
             ],
         });
 
@@ -191,15 +207,15 @@ onMounted(() => {
     loadData();
     loadProsesData();
 
-    var elem = document.querySelector("#date");
-    new Datepicker(elem, {
-        format: "dd/mm/yyyy",
-    });
+    // var elem = document.querySelector("#date");
+    // new Datepicker(elem, {
+    //     format: "dd/mm/yyyy",
+    // });
 
-    elem.addEventListener("changeDate", (event) => {
-        form.tanggal = event.target.value;
-        loadProsesData();
-    });
+    // elem.addEventListener("changeDate", (event) => {
+    //     form.tanggal = event.target.value;
+    //     loadProsesData();
+    // });
 
     var elem2 = document.querySelector("#inputBulanTahun");
     new Datepicker(elem2, {
@@ -259,206 +275,17 @@ watch(
             <!--end col-->
         </div>
 
-        <form @submit.prevent="submit" autocomplete="off" novalidate>
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="">
-                                <h3 class="card-title">Laba Harian</h3>
-                                <!-- <Link
-                                :href="route('categories.create')"
-                                :preserve-state="true"
-                                class="btn btn-primary btn-icon-square-sm"
-                                ><i class="fas fa-plus-circle"></i
-                            ></Link> -->
-                            </div>
-                        </div>
-                        <!--end card-header-->
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-12">
-                                    <h6>Tanggal</h6>
-                                    <input
-                                        id="date"
-                                        class="form-control form-control-lg"
-                                        :class="{
-                                            'is-invalid': form.errors.tanggal,
-                                        }"
-                                        type="text"
-                                        v-model="form.tanggal"
-                                    />
-                                    <div class="invalid-feedback">
-                                        {{ form.errors.tanggal }}
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <h6>Penjualan</h6>
-                                    <CurrencyInput
-                                        class="form-control form-control-lg"
-                                        :class="{
-                                            'is-invalid': form.errors.penjualan,
-                                        }"
-                                        type="text"
-                                        v-model="form.penjualan"
-                                        :disabled="!formEdit"
-                                    />
-                                    <div class="invalid-feedback">
-                                        {{ form.errors.penjualan }}
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <h6>Pengeluaran</h6>
-                                    <CurrencyInput
-                                        class="form-control form-control-lg"
-                                        :class="{
-                                            'is-invalid':
-                                                form.errors.pengeluaran,
-                                        }"
-                                        type="text"
-                                        v-model="form.pengeluaran"
-                                        disabled
-                                    />
-                                    <div class="invalid-feedback">
-                                        {{ form.errors.pengeluaran }}
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <h6>Laba</h6>
-                                    <CurrencyInput
-                                        class="form-control form-control-lg"
-                                        :class="{
-                                            'is-invalid': form.errors.laba,
-                                        }"
-                                        type="text"
-                                        v-model="form.laba"
-                                        :disabled="!formEdit"
-                                    />
-                                    <div class="invalid-feedback">
-                                        {{ form.errors.laba }}
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="row">
-                                        <div class="col-2">
-                                            <h6>Persentase %</h6>
-                                            <input
-                                                class="form-control form-control-lg"
-                                                :class="{
-                                                    'is-invalid':
-                                                        form.errors
-                                                            .persen_pemilik,
-                                                }"
-                                                type="text"
-                                                v-model="form.persen_pemilik"
-                                                disabled
-                                            />
-                                            <div class="invalid-feedback">
-                                                {{ form.errors.persen_pemilik }}
-                                            </div>
-                                        </div>
-                                        <div class="col-10">
-                                            <h6>Laba Pemilik</h6>
-                                            <CurrencyInput
-                                                class="form-control form-control-lg"
-                                                :class="{
-                                                    'is-invalid':
-                                                        form.errors
-                                                            .laba_pemilik,
-                                                }"
-                                                type="text"
-                                                v-model="form.laba_pemilik"
-                                                :disabled="!formEdit"
-                                            />
-                                            <div class="invalid-feedback">
-                                                {{ form.errors.laba_pemilik }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-2">
-                                            <h6>Persentase %</h6>
-                                            <input
-                                                class="form-control form-control-lg"
-                                                :class="{
-                                                    'is-invalid':
-                                                        form.errors
-                                                            .persen_karyawan,
-                                                }"
-                                                type="text"
-                                                v-model="form.persen_karyawan"
-                                                disabled
-                                            />
-                                            <div class="invalid-feedback">
-                                                {{
-                                                    form.errors.persen_karyawan
-                                                }}
-                                            </div>
-                                        </div>
-                                        <div class="col-10">
-                                            <h6>Laba Karyawan</h6>
-                                            <CurrencyInput
-                                                class="form-control form-control-lg"
-                                                :class="{
-                                                    'is-invalid':
-                                                        form.errors
-                                                            .laba_karyawan,
-                                                }"
-                                                type="text"
-                                                v-model="form.laba_karyawan"
-                                                :disabled="!formEdit"
-                                            />
-                                            <div class="invalid-feedback">
-                                                {{ form.errors.laba_karyawan }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="text-end mt-3">
-                                <button
-                                    v-if="!formEdit"
-                                    type="button"
-                                    class="btn btn-secondary mt-2"
-                                    style="width: 100px"
-                                    @click="formEdit = true"
-                                >
-                                    Edit
-                                </button>
-                                <button
-                                    v-if="formEdit"
-                                    type="button"
-                                    class="btn btn-secondary mt-2 me-2"
-                                    style="width: 100px"
-                                    @click="formEdit = false"
-                                >
-                                    Batal
-                                </button>
-                                <button
-                                    v-if="formEdit"
-                                    type="submit"
-                                    class="btn btn-primary mt-2"
-                                    style="width: 100px"
-                                    :disabled="form.processing"
-                                >
-                                    Simpan
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- end col -->
-            </div>
-            <!-- end row -->
-        </form>
-
         <div class="row">
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <div class="">
-                            <h3 class="card-title">Daftar Laba Harian</h3>
+                        <div class="text-end">
+                            <!-- <h5 class="card-title">Periode</h5> -->
+                            <Link
+                                :href="route('laba.create')"
+                                class="btn btn-primary btn-icon-square-sm"
+                                ><i class="fas fa-plus-circle"></i
+                            ></Link>
                         </div>
                     </div>
                     <!--end card-header-->
@@ -488,6 +315,7 @@ watch(
                                         <th>Laba</th>
                                         <th>Laba Pemilik</th>
                                         <th>Laba Karyawan</th>
+                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>

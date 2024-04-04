@@ -38,8 +38,10 @@ class LabaController extends Controller
      */
     public function create()
     {
-        return Inertia::modal('Laba/Create')
-            ->baseRoute('nilai.index');
+        $nilai = Nilai::first();
+        return Inertia::render('Laba/Create', [
+            'nilai' => $nilai
+        ]);
     }
 
     /**
@@ -83,8 +85,11 @@ class LabaController extends Controller
     public function edit(string $id)
     {
         $data = Laba::find($id);
-        return Inertia::modal('Laba/Edit', ['data' => $data])
-            ->baseRoute('nilai.index');
+        $nilai = Nilai::first();
+        return Inertia::render('Laba/Edit', [
+            'data' => $data,
+            'nilai' => $nilai
+        ]);
     }
 
     /**
