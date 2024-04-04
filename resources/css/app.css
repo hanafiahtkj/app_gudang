@@ -37,6 +37,12 @@ table.dataTable .btn-icon {
     padding-top: 0px;
 }
 
+table.dataTable .btn {
+    width: 75px;
+    padding-bottom: 0px;
+    padding-top: 0px;
+}
+
 .selectr-selected {
     padding-top: .5rem;
     padding-bottom: .5rem;

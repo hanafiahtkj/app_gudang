@@ -112,15 +112,10 @@ const loadData = async () => {
                     data: null,
                     render: function (data, type, row) {
                         return `
-                            <div class="dropdown">
-                                <button class="btn btn-sm btn-icon btn-default me-1" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <a class="dropdown-item show-link" href="#" data-user-id="${row.id}">Detail</a>
-                                    <a class="dropdown-item edit-link" href="#" data-user-id="${row.id}">Edit</a>
-                                    <a class="dropdown-item delete-link" href="#" data-user-id="${row.id}">Hapus</a>
-                                </div>
+                            <div class="button-items">
+                                <button type="button" class="btn btn-dark show-link" data-user-id="${row.id}">Detail</button>
+                                <button type="button" class="btn btn-secondary edit-link" data-user-id="${row.id}">Edit</button>
+                                <button type="button" class="btn btn-danger delete-link" data-user-id="${row.id}">Hapus</button>
                             </div>
                         `;
                     },
@@ -220,7 +215,7 @@ onMounted(() => {
                                         </th>
                                         <th>Gudang</th>
                                         <th>Total Harga</th>
-                                        <th>Aksi</th>
+                                        <th style="min-width: 250px">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
