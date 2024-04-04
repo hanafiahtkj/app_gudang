@@ -23,9 +23,12 @@ class StockReductionController extends Controller
         return Inertia::render('StockReductions/Index');
     }
 
-    public function loadDatatables()
+    public function loadDatatables(Request $request)
     {
-        $model = StockReduction::with('warehouse');
+        $bulantahun = explode("/", $request->bulantahun);
+        $model = StockReduction::with('warehouse')
+            ->whereYear('stock_reduction_date', '=', $bulantahun[1])
+            ->whereMonth('stock_reduction_date', '=', $bulantahun[0]);
 
         return DataTables::of($model)->toJson();
     }

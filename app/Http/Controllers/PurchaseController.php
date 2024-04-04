@@ -23,9 +23,12 @@ class PurchaseController extends Controller
         return Inertia::render('Purchases/Index');
     }
 
-    public function loadDatatables()
+    public function loadDatatables(Request $request)
     {
-        $model = Purchase::with('warehouse');
+        $bulantahun = explode("/", $request->bulantahun);
+        $model = Purchase::with('warehouse')
+            ->whereYear('date', '=', $bulantahun[1])
+            ->whereMonth('date', '=', $bulantahun[0]);
 
         return DataTables::of($model)->toJson();
     }

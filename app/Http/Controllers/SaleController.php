@@ -23,9 +23,12 @@ class SaleController extends Controller
         return Inertia::render('Sales/Index');
     }
 
-    public function loadDatatables()
+    public function loadDatatables(Request $request)
     {
-        $model = Sale::with('warehouse');
+        $bulantahun = explode("/", $request->bulantahun);
+        $model = Sale::with('warehouse')
+            ->whereYear('sale_date', '=', $bulantahun[1])
+            ->whereMonth('sale_date', '=', $bulantahun[0]);
 
         return DataTables::of($model)->toJson();
     }

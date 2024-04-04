@@ -1,12 +1,14 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 import { Modal } from "momentum-modal";
 import Swal from "sweetalert2";
 import accounting from "accounting";
+import { format } from "date-fns";
 
 let datatable;
+const bulantahun = ref(format(new Date(), "MM/yyyy"));
 
 const setupEventListeners = () => {
     $(document).on("click", ".show-link", function (e) {
@@ -93,6 +95,9 @@ const loadData = async () => {
             ],
             ajax: {
                 url: route("purchases.loadDatatables"),
+                data: function (d) {
+                    d.bulantahun = bulantahun.value;
+                },
             },
             columns: [
                 { data: "date" },
@@ -131,6 +136,17 @@ const loadData = async () => {
 
 onMounted(() => {
     loadData();
+
+    var elem = document.querySelector("#inputBulanTahun");
+    new Datepicker(elem, {
+        format: "mm/yyyy",
+        pickLevel: 1,
+    });
+
+    elem.addEventListener("changeDate", (event) => {
+        bulantahun.value = event.target.value;
+        redrawDataTable();
+    });
 });
 </script>
 
@@ -180,6 +196,17 @@ onMounted(() => {
                     </div>
                     <!--end card-header-->
                     <div class="card-body">
+                        <h6>Filter Bulan & Tahun</h6>
+                        <div class="form-group mb-3">
+                            <input
+                                type="text"
+                                placeholder=""
+                                class="form-control"
+                                v-model="bulantahun"
+                                autocomplete="off"
+                                id="inputBulanTahun"
+                            />
+                        </div>
                         <div class="table-responsive">
                             <table
                                 class="table table-striped"

@@ -15,6 +15,7 @@ const props = defineProps({
 });
 
 let datatable;
+const bulantahun = ref(format(new Date(), "MM/yyyy"));
 
 const formEdit = ref(false);
 
@@ -121,6 +122,9 @@ const loadData = async () => {
             ],
             ajax: {
                 url: route("laba.loadDatatables"),
+                data: function (d) {
+                    d.bulantahun = bulantahun.value;
+                },
             },
             columns: [
                 { data: "tanggal" },
@@ -195,6 +199,17 @@ onMounted(() => {
     elem.addEventListener("changeDate", (event) => {
         form.tanggal = event.target.value;
         loadProsesData();
+    });
+
+    var elem2 = document.querySelector("#inputBulanTahun");
+    new Datepicker(elem2, {
+        format: "mm/yyyy",
+        pickLevel: 1,
+    });
+
+    elem2.addEventListener("changeDate", (event) => {
+        bulantahun.value = event.target.value;
+        redrawDataTable();
     });
 });
 
@@ -448,6 +463,17 @@ watch(
                     </div>
                     <!--end card-header-->
                     <div class="card-body">
+                        <h6>Filter Bulan & Tahun</h6>
+                        <div class="form-group mb-3">
+                            <input
+                                type="text"
+                                placeholder=""
+                                class="form-control"
+                                v-model="bulantahun"
+                                autocomplete="off"
+                                id="inputBulanTahun"
+                            />
+                        </div>
                         <div class="table-responsive">
                             <table
                                 class="table"

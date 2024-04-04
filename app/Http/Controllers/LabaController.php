@@ -24,9 +24,11 @@ class LabaController extends Controller
         ]);
     }
 
-    public function loadDatatables()
+    public function loadDatatables(Request $request)
     {
-        $model = Laba::query();
+        $bulantahun = explode("/", $request->bulantahun);
+        $model = Laba::whereYear('tanggal', '=', $bulantahun[1])
+            ->whereMonth('tanggal', '=', $bulantahun[0]);
 
         return DataTables::of($model)->toJson();
     }
