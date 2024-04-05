@@ -12,6 +12,7 @@ use App\Http\Controllers\SaleController;
 use App\Http\Controllers\NilaiController;
 use App\Http\Controllers\LabaController;
 use App\Http\Controllers\StockReductionController;
+use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -80,6 +81,9 @@ Route::middleware('auth')->group(function () {
     Route::get('stock-reduction/loadDatatables', [StockReductionController::class, 'loadDatatables'])->name('stock-reduction.loadDatatables');
     Route::get('stock-reduction/modalProducts', [StockReductionController::class, 'modalProducts'])->name('stock-reduction.modalProducts');
     Route::resource('stock-reduction', StockReductionController::class);
+
+    Route::get('users/loadDatatables', [UserController::class, 'loadDatatables'])->name('users.loadDatatables');
+    Route::resource('users', UserController::class);
 });
 
 

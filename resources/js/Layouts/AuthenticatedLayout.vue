@@ -5,9 +5,11 @@ import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
 import NavLink from "@/Components/NavLink.vue";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
-import { Link } from "@inertiajs/vue3";
+import { Link, usePage } from "@inertiajs/vue3";
 
 const showingNavigationDropdown = ref(false);
+
+const page = usePage();
 </script>
 
 <template>
@@ -249,6 +251,33 @@ const showingNavigationDropdown = ref(false);
                                         Nilai
                                     </Link>
                                 </li>
+                                <template
+                                    v-if="
+                                        ['super-admin'].includes(
+                                            page.props.auth.user.roles[0].name
+                                        )
+                                    "
+                                >
+                                    <li>
+                                        <Link
+                                            :href="route('users.index')"
+                                            class="dropdown-item"
+                                        >
+                                            User
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <a
+                                            :href="
+                                                route('index') + '/laratrust'
+                                            "
+                                            class="dropdown-item"
+                                            target="_blank"
+                                        >
+                                            Role
+                                        </a>
+                                    </li>
+                                </template>
                             </ul>
                             <!--end submenu-->
                         </li>
