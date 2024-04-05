@@ -251,33 +251,31 @@ const page = usePage();
                                         Nilai
                                     </Link>
                                 </li>
-                                <template
+                                <!-- <template
                                     v-if="
                                         ['super-admin'].includes(
                                             page.props.auth.user.roles[0].name
                                         )
                                     "
-                                >
-                                    <li>
-                                        <Link
-                                            :href="route('users.index')"
-                                            class="dropdown-item"
-                                        >
-                                            User
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <a
-                                            :href="
-                                                route('index') + '/laratrust'
-                                            "
-                                            class="dropdown-item"
-                                            target="_blank"
-                                        >
-                                            Role
-                                        </a>
-                                    </li>
-                                </template>
+                                > -->
+                                <li>
+                                    <Link
+                                        :href="route('users.index')"
+                                        class="dropdown-item"
+                                    >
+                                        User
+                                    </Link>
+                                </li>
+                                <li>
+                                    <a
+                                        :href="route('index') + '/laratrust'"
+                                        class="dropdown-item"
+                                        target="_blank"
+                                    >
+                                        Role
+                                    </a>
+                                </li>
+                                <!-- </template> -->
                             </ul>
                             <!--end submenu-->
                         </li>
