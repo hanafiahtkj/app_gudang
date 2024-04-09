@@ -4,6 +4,7 @@ import { ref, onMounted } from "vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 import { Modal } from "momentum-modal";
 import Swal from "sweetalert2";
+import accounting from "accounting";
 
 let datatable;
 
@@ -46,6 +47,18 @@ const setupEventListeners = () => {
     });
 };
 
+const formatNumber = (value) => {
+    const decimalPart = value.toString().split(".")[1]; // Mengambil bagian desimal dari nilai
+    const precision =
+        decimalPart && parseInt(decimalPart) !== 0 ? decimalPart.length : 0; // Menetapkan precision berdasarkan nilai setelah titik desimal
+    return accounting.formatMoney(value, {
+        symbol: "", // Tidak menampilkan simbol mata uang
+        precision: precision, // Menampilkan precision sesuai perhitungan di atas
+        thousand: ",", // Menyusun ribuan dengan titik
+        decimal: ".", // Menyusun desimal dengan koma
+    });
+};
+
 const redrawDataTable = () => {
     if (datatable) {
         datatable.ajax.reload(null, false);
@@ -75,8 +88,12 @@ const loadData = async () => {
             },
             columns: [
                 { data: "name" },
-
-                { data: "stock" },
+                {
+                    data: "stock",
+                    render: function (data, type, row) {
+                        return formatNumber(data);
+                    },
+                },
                 { data: "unit" },
                 { data: "description" },
                 {

@@ -60,7 +60,7 @@ class StockReductionController extends Controller
         ];
         if ($input['sale_details']) {
             foreach ($input['sale_details'] as $key => $value) {
-                $rules['sale_details.'.$key.'.quantity'] = 'required|not_in:0';
+                $rules['sale_details.'.$key.'.quantity'] = 'required|numeric|min:1|max:'.$value['product']['stock'];
                 $rules['sale_details.'.$key.'.description'] = 'required|not_in:0';
                 // $rules['sale_details.'.$key.'.total'] = 'required|not_in:0';
             }

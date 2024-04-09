@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('stock_reduction_id');
             $table->foreignId('product_id');
-            $table->integer('quantity');
+            $table->decimal('quantity', 12, 2);
             $table->text('description');
             $table->timestamps();
         });
