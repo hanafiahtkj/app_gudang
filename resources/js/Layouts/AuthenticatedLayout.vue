@@ -5,11 +5,41 @@ import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
 import NavLink from "@/Components/NavLink.vue";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
-import { Link, usePage } from "@inertiajs/vue3";
+import { Link, usePage, useForm } from "@inertiajs/vue3";
+import Swal from "sweetalert2";
 
 const showingNavigationDropdown = ref(false);
+let profileModal;
 
 const page = usePage();
+
+const form = useForm({
+    name: "",
+    email: "",
+    posisi: "",
+    password: "",
+    password_confirmation: "",
+    ...page.props.auth.user,
+});
+
+const submit = () => {
+    form.post(route("myprofile.store"), {
+        onFinish: () => {
+            // form.reset('password', 'password_confirmation');
+        },
+        onSuccess: () => {
+            Swal.fire({
+                title: "Berhasil disimpan!",
+                icon: "success",
+                showCloseButton: true,
+            });
+            // profileModal = new bootstrap.Modal(
+            //     document.getElementById("profileModal")
+            // );
+            // profileModal.hide();
+        },
+    });
+};
 </script>
 
 <template>
@@ -99,6 +129,16 @@ const page = usePage();
                             Settings</a
                         >
                         <div class="dropdown-divider mb-0"></div> -->
+                        <a
+                            class="dropdown-item"
+                            href="#"
+                            data-bs-toggle="modal"
+                            data-bs-target="#profileModal"
+                            ><i
+                                class="ti ti-settings font-16 me-1 align-text-bottom"
+                            ></i>
+                            Profil</a
+                        >
                         <Link
                             :href="route('logout')"
                             method="post"
@@ -420,4 +460,121 @@ const page = usePage();
     </footer>
     <!-- end Footer -->
     <!--end footer-->
+
+    <!-- Modal -->
+    <form @submit.prevent="submit" autocomplete="off" novalidate>
+        <div
+            class="modal fade"
+            id="profileModal"
+            tabindex="-1"
+            aria-labelledby="profileModalLabel"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="profileModalLabel">
+                            Profil
+                        </h1>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                        ></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6>Username</h6>
+                        <div class="form-group">
+                            <input
+                                id="email"
+                                type="text"
+                                placeholder="Username"
+                                class="form-control"
+                                :class="{ 'is-invalid': form.errors.email }"
+                                v-model="form.email"
+                                autocomplete="off"
+                            />
+                            <div class="invalid-feedback">
+                                {{ form.errors.email }}
+                            </div>
+                        </div>
+                        <h6>Nama Lengkap</h6>
+                        <div class="form-group">
+                            <input
+                                id="name"
+                                type="text"
+                                placeholder="Name"
+                                class="form-control"
+                                :class="{ 'is-invalid': form.errors.name }"
+                                v-model="form.name"
+                                autocomplete="off"
+                            />
+                            <div class="invalid-feedback">
+                                {{ form.errors.name }}
+                            </div>
+                        </div>
+                        <h6>Posisi</h6>
+                        <div class="form-group">
+                            <input
+                                id="posisi"
+                                type="text"
+                                placeholder="Posisi"
+                                class="form-control"
+                                :class="{ 'is-invalid': form.errors.posisi }"
+                                v-model="form.posisi"
+                                autocomplete="off"
+                            />
+                            <div class="invalid-feedback">
+                                {{ form.errors.posisi }}
+                            </div>
+                        </div>
+
+                        <h6>Password</h6>
+                        <div class="form-group">
+                            <input
+                                id="password"
+                                type="password"
+                                placeholder="Password"
+                                class="form-control"
+                                :class="{ 'is-invalid': form.errors.password }"
+                                v-model="form.password"
+                                autocomplete="off"
+                            />
+                            <div class="invalid-feedback">
+                                {{ form.errors.password }}
+                            </div>
+                        </div>
+                        <h6>Konfirmasi Password</h6>
+                        <div class="form-group">
+                            <input
+                                id="confirm-password"
+                                type="password"
+                                placeholder="Password"
+                                class="form-control"
+                                v-model="form.password_confirmation"
+                                autocomplete="off"
+                            />
+                        </div>
+                        <div class="alert alert-outline-warning mt-3">
+                            Untuk mengubah Password silahkan isi Password yang
+                            terbaru
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                        >
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Simpan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
 </template>

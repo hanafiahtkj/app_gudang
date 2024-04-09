@@ -13,6 +13,7 @@ use App\Http\Controllers\NilaiController;
 use App\Http\Controllers\LabaController;
 use App\Http\Controllers\StockReductionController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\MyProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -87,6 +88,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('users/loadDatatables', [UserController::class, 'loadDatatables'])->name('users.loadDatatables');
     Route::resource('users', UserController::class);
+
+    Route::post('myprofile/store', [MyProfileController::class, 'store'])->name('myprofile.store');
 });
 
 
