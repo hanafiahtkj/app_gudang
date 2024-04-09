@@ -200,6 +200,7 @@ class StockReductionController extends Controller
         $query = DB::table('stock_reduction_details')
             ->join('stock_reductions', 'stock_reduction_details.stock_reduction_id', '=', 'stock_reductions.id')
             ->join('products', 'stock_reduction_details.product_id', '=', 'products.id')
+            ->where('stock_reductions.stock_reduction_date', $tanggal)
             ->select(
                 'stock_reduction_details.product_id',
                 'stock_reductions.warehouse_id',

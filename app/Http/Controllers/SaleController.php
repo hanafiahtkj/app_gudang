@@ -200,6 +200,7 @@ class SaleController extends Controller
         $query = DB::table('sale_details')
             ->join('sales', 'sale_details.sale_id', '=', 'sales.id')
             ->join('products', 'sale_details.product_id', '=', 'products.id')
+            ->where('sales.sale_date', $tanggal)
             ->select(
                 'sale_details.product_id',
                 'sales.warehouse_id',

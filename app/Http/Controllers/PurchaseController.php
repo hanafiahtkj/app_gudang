@@ -192,6 +192,7 @@ class PurchaseController extends Controller
         $query = DB::table('purchase_details')
             ->join('purchases', 'purchase_details.purchase_id', '=', 'purchases.id')
             ->join('products', 'purchase_details.product_id', '=', 'products.id')
+            ->where('purchases.date', $tanggal)
             ->select(
                 'purchase_details.product_id',
                 'purchases.warehouse_id',
