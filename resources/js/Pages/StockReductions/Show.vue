@@ -111,6 +111,7 @@ onMounted(() => {
                                                     <tr>
                                                         <th>Nama Produk</th>
                                                         <th>Jumlah</th>
+                                                        <th>Keterangan</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -146,6 +147,14 @@ onMounted(() => {
                                                                         .unit
                                                                 }}
                                                             </div>
+                                                        </td>
+                                                        <td>
+                                                            {{
+                                                                data
+                                                                    .stock_reduction_details[
+                                                                    index
+                                                                ].description
+                                                            }}
                                                         </td>
                                                     </tr>
                                                 </tbody>
