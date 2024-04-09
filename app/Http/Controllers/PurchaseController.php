@@ -12,6 +12,8 @@ use DataTables;
 use Str;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Redirect;
+use Barryvdh\DomPDF\Facade\Pdf;
+use DB;
 
 class PurchaseController extends Controller
 {
@@ -182,5 +184,32 @@ class PurchaseController extends Controller
 
         $dataDetails = PurchaseDetails::where('purchase_id', $id);
         $dataDetails->delete();
+    }
+
+    function laporanPdf(Request $request)
+    {
+        $tanggal = Carbon::createFromFormat('d/m/Y', $request->today)->format('Y-m-d');
+        $query = DB::table('purchase_details')
+            ->join('purchases', 'purchase_details.purchase_id', '=', 'purchases.id')
+            ->join('products', 'purchase_details.product_id', '=', 'products.id')
+            ->select(
+                'purchase_details.product_id',
+                'purchases.warehouse_id',
+                'products.name',
+                DB::raw('SUM(purchase_details.quantity) as total_quantity'),
+                DB::raw('SUM(purchase_details.total) as total_unitcost')
+            )
+            ->groupBy(
+                'purchase_details.product_id',
+                'purchases.warehouse_id',
+                'products.name',
+            );
+
+        $pdf = Pdf::loadView('pdf.purchases', [
+            'tanggal' => $tanggal,
+            'data' => $query->get(),
+        ]);
+
+        return $pdf->stream('pemasukan_'.str_replace("/", "_", $tanggal).'.pdf');
     }
 }

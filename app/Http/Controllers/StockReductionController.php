@@ -12,6 +12,8 @@ use DataTables;
 use Str;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Redirect;
+use Barryvdh\DomPDF\Facade\Pdf;
+use DB;
 
 class StockReductionController extends Controller
 {
@@ -190,5 +192,31 @@ class StockReductionController extends Controller
     {
         return Inertia::modal('StockReductions/Modal')
             ->baseRoute('stock-reduction.index');
+    }
+
+    function laporanPdf(Request $request)
+    {
+        $tanggal = Carbon::createFromFormat('d/m/Y', $request->today)->format('Y-m-d');
+        $query = DB::table('stock_reduction_details')
+            ->join('stock_reductions', 'stock_reduction_details.stock_reduction_id', '=', 'stock_reductions.id')
+            ->join('products', 'stock_reduction_details.product_id', '=', 'products.id')
+            ->select(
+                'stock_reduction_details.product_id',
+                'stock_reductions.warehouse_id',
+                'products.name',
+                DB::raw('SUM(stock_reduction_details.quantity) as total_quantity')
+            )
+            ->groupBy(
+                'stock_reduction_details.product_id',
+                'stock_reductions.warehouse_id',
+                'products.name',
+            );
+
+        $pdf = Pdf::loadView('pdf.stock_reductions', [
+            'tanggal' => $tanggal,
+            'data' => $query->get(),
+        ]);
+
+        return $pdf->stream('penyusutan_'.str_replace("/", "_", $tanggal).'.pdf');
     }
 }

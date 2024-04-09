@@ -142,9 +142,9 @@ onMounted(() => {
                             <Link
                                 :href="route('products.create')"
                                 :preserve-state="true"
-                                class="btn btn-primary btn-icon-square-sm"
-                                ><i class="fas fa-plus-circle"></i
-                            ></Link>
+                                class="btn btn-primary"
+                                ><i class="fas fa-plus-circle"></i> Tambah</Link
+                            >
                         </div>
                     </div>
                     <!--end card-header-->

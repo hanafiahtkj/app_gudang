@@ -9,6 +9,7 @@ import { format } from "date-fns";
 
 let datatable;
 const bulantahun = ref(format(new Date(), "MM/yyyy"));
+const today = ref(format(new Date(), "dd/MM/yyyy"));
 
 const setupEventListeners = () => {
     $(document).on("click", ".show-link", function (e) {
@@ -142,6 +143,11 @@ onMounted(() => {
         bulantahun.value = event.target.value;
         redrawDataTable();
     });
+
+    var elem2 = document.querySelector("#inputToday");
+    new Datepicker(elem2, {
+        format: "dd/mm/yyyy",
+    });
 });
 </script>
 
@@ -182,11 +188,19 @@ onMounted(() => {
                     <div class="card-header">
                         <div class="text-end">
                             <!-- <h5 class="card-title">Periode</h5> -->
+                            <button
+                                type="button"
+                                class="btn btn-success me-2"
+                                data-bs-toggle="modal"
+                                data-bs-target="#laporanModal"
+                            >
+                                <i class="fas fa-download"></i> PDF
+                            </button>
                             <Link
                                 :href="route('purchases.create')"
-                                class="btn btn-primary btn-icon-square-sm"
-                                ><i class="fas fa-plus-circle"></i
-                            ></Link>
+                                class="btn btn-primary"
+                                ><i class="fas fa-plus-circle"></i> Tambah</Link
+                            >
                         </div>
                     </div>
                     <!--end card-header-->
@@ -227,6 +241,63 @@ onMounted(() => {
             <!-- end col -->
         </div>
         <!-- end row -->
+
+        <!-- Modal -->
+        <form
+            method="GET"
+            :action="route('purchases.laporanPdf')"
+            target="_blank"
+        >
+            <div
+                class="modal fade"
+                id="laporanModal"
+                tabindex="-1"
+                aria-labelledby="laporanModalLabel"
+                aria-hidden="true"
+            >
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="laporanModalLabel">
+                                Laporan
+                            </h1>
+                            <button
+                                type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                            ></button>
+                        </div>
+                        <div class="modal-body">
+                            <h6>Tanggal</h6>
+                            <div class="form-group mb-3">
+                                <input
+                                    type="text"
+                                    placeholder=""
+                                    class="form-control"
+                                    autocomplete="off"
+                                    id="inputToday"
+                                    v-model="today"
+                                    name="today"
+                                />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button
+                                type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal"
+                            >
+                                Close
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                Unduh PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
 
         <Modal :redrawDataTable="redrawDataTable" />
     </AuthenticatedLayout>

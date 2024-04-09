@@ -64,9 +64,11 @@ Route::middleware('auth')->group(function () {
     Route::get('products/loadDatatables', [ProductController::class, 'loadDatatables'])->name('products.loadDatatables');
     Route::resource('products', ProductController::class);
 
+    Route::get('purchases/laporanPdf', [PurchaseController::class, 'laporanPdf'])->name('purchases.laporanPdf');
     Route::get('purchases/loadDatatables', [PurchaseController::class, 'loadDatatables'])->name('purchases.loadDatatables');
     Route::resource('purchases', PurchaseController::class);
 
+    Route::get('sales/laporanPdf', [SaleController::class, 'laporanPdf'])->name('sales.laporanPdf');
     Route::get('sales/loadDatatables', [SaleController::class, 'loadDatatables'])->name('sales.loadDatatables');
     Route::get('sales/modalProducts', [SaleController::class, 'modalProducts'])->name('sales.modalProducts');
     Route::resource('sales', SaleController::class);
@@ -78,6 +80,7 @@ Route::middleware('auth')->group(function () {
     Route::get('laba/loadProsesData', [LabaController::class, 'loadProsesData'])->name('laba.loadProsesData');
     Route::resource('laba', LabaController::class);
 
+    Route::get('stock-reduction/laporanPdf', [StockReductionController::class, 'laporanPdf'])->name('stock-reduction.laporanPdf');
     Route::get('stock-reduction/loadDatatables', [StockReductionController::class, 'loadDatatables'])->name('stock-reduction.loadDatatables');
     Route::get('stock-reduction/modalProducts', [StockReductionController::class, 'modalProducts'])->name('stock-reduction.modalProducts');
     Route::resource('stock-reduction', StockReductionController::class);
