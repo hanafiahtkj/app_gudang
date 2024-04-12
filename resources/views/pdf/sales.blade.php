@@ -33,7 +33,8 @@
     </style>
 </head>
 <body>
-    <h1 style="text-align: center; font-size: 14px;">JACK KOLAM</h1>
+    <h1 style="text-align: center; font-size: 18px;">JACK KOLAM</h1>
+    <h1 style="text-align: center; font-size: 14px; margin-bottom: 30px;">DAFTAR PENGELUARAN</h1>
 
     <table class="agenda" style="margin-bottom: 15px;">
         <tr>
