@@ -16,8 +16,8 @@ let datatable;
 const formEdit = ref(false);
 
 const form = useForm({
-    persen_pemilik: props.nilai.persen_pemilik ?? 0,
-    persen_karyawan: props.nilai.persen_karyawan ?? 0,
+    persen_pemilik: props.nilai?.persen_pemilik ?? 0,
+    persen_karyawan: props.nilai?.persen_karyawan ?? 0,
 });
 
 const submit = () => {
