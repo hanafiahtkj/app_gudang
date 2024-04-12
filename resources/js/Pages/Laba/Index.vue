@@ -278,9 +278,9 @@ watch(
                             <!-- <h5 class="card-title">Periode</h5> -->
                             <Link
                                 :href="route('laba.create')"
-                                class="btn btn-primary btn-icon-square-sm"
-                                ><i class="fas fa-plus-circle"></i
-                            ></Link>
+                                class="btn btn-primary"
+                                ><i class="fas fa-plus-circle"></i> Tambah</Link
+                            >
                         </div>
                     </div>
                     <!--end card-header-->
