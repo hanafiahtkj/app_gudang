@@ -161,7 +161,7 @@ class PurchaseController extends Controller
                     'total' => $value['total'],
                 ];
 
-                if (array_key_exists('id', $value)) {
+                if (array_key_exists('id', $value) && @$value['id'] !== '' && @$value['id'] !== null) {
                     PurchaseDetails::find($value['id'])
                         ->update($purchaseDetails);
                 }

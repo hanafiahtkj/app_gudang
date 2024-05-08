@@ -562,7 +562,7 @@ const loadData = async () => {
                 <div class="modal-content">
                     <div class="modal-header">
                         <h6 class="modal-title m-0" id="modalProductsLabel">
-                            Default Modal
+                            Produk
                         </h6>
                         <button
                             type="button"

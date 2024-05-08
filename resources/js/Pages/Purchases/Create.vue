@@ -6,6 +6,7 @@ import { Modal } from "momentum-modal";
 import Swal from "sweetalert2";
 import { format } from "date-fns";
 import CurrencyInput from "@/Components/CurrencyInput.vue";
+import accounting from "accounting";
 
 const props = defineProps({
     warehouses: {
@@ -42,6 +43,8 @@ const submit = () => {
 const product_id = ref("");
 let selectrWarehouse;
 let selectrProduct;
+let datatable;
+let modal;
 
 const addProduct = (id) => {
     const product = props.products.find((value) => value.id === id);
@@ -67,7 +70,7 @@ const addProduct = (id) => {
     });
     form.purchase_details = tempPurchaseDetails;
     product_id.value = "";
-    selectrProduct.clear();
+    // selectrProduct.clear();
 };
 
 const removeProduct = (index) => {
@@ -99,16 +102,88 @@ watch(
     { deep: true }
 );
 
+const formatCurrency = (value) => {
+    // Memeriksa apakah value tidak null atau undefined
+    if (value !== null && value !== undefined) {
+        const decimalCount = (value.toString().split(".")[1] || "").length;
+        return accounting.formatMoney(value, {
+            symbol: "", // Tidak menampilkan simbol mata uang
+            precision: decimalCount || 0, // Menampilkan 2 angka di belakang koma
+            thousand: ",", // Menyusun ribuan dengan titik
+            decimal: ".", // Menyusun desimal dengan koma
+        });
+    } else {
+        // Mengembalikan string kosong jika value null atau undefined
+        return "";
+    }
+};
+
 onMounted(() => {
     // selectrWarehouse = new Selectr("#warehouse");
 
-    selectrProduct = new Selectr("#product");
+    // selectrProduct = new Selectr("#product");
 
     var elem = document.querySelector("#date");
     new Datepicker(elem, {
         format: "dd/mm/yyyy",
     });
+
+    loadData();
+
+    events = document.getElementById("modalProducts");
+    events.addEventListener("show.bs.modal", redrawDataTable);
+
+    modal = new bootstrap.Modal(events);
 });
+
+const redrawDataTable = () => {
+    if (datatable) {
+        datatable.ajax.reload(null, false);
+    }
+};
+
+const loadData = async () => {
+    try {
+        datatable = $("#datatables").DataTable({
+            // responsive: true,
+            select: true,
+            lengthMenu: [
+                [5, 10, 50, -1],
+                [5, 10, 50, "All"],
+            ],
+            ajax: {
+                url: route("products.loadDatatables"),
+                data: function (d) {
+                    // d.warehouse_id = form.warehouse_id;
+                    d.product_ids = form.purchase_details.map(
+                        (detail) => detail.product_id
+                    );
+                },
+            },
+            columns: [
+                { data: "name" },
+                { data: "unit" },
+                { data: "stock" },
+                // {
+                //     data: "unitcost",
+                //     render: function (data, type, row) {
+                //         return formatCurrency(data);
+                //     },
+                // },
+            ],
+        });
+
+        datatable.on("select", function (e, dt, type, indexes) {
+            let rowData = datatable.rows(indexes).data();
+            addProduct(rowData[0].id);
+            modal.hide();
+        });
+
+        // setupEventListeners();
+    } catch (error) {
+        console.error("Gagal memuat data:", error);
+    }
+};
 </script>
 
 <template>
@@ -214,7 +289,7 @@ onMounted(() => {
                             </div>
                             <!-- end row -->
 
-                            <div class="row">
+                            <!-- <div class="row">
                                 <div class="col-md-12">
                                     <h6>Cari Produk</h6>
                                     <select
@@ -231,12 +306,22 @@ onMounted(() => {
                                         </option>
                                     </select>
                                 </div>
-                                <!-- end col -->
-                            </div>
+                            </div> -->
                             <!-- end row -->
 
-                            <div class="row mt-4">
+                            <div class="row mt-2">
                                 <div class="col-md-12">
+                                    <div class="text-end">
+                                        <button
+                                            type="button"
+                                            class="btn btn-de-dashed-primary btn-lg mb-3"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalProducts"
+                                        >
+                                            <i class="fas fa-plus-circle"></i>
+                                            Produk
+                                        </button>
+                                    </div>
                                     <div class="table-responsive">
                                         <table
                                             class="table table-bordered mb-0"
@@ -413,6 +498,68 @@ onMounted(() => {
             <!-- end row -->
         </form>
 
-        <Modal :redrawDataTable="redrawDataTable" />
+        <!-- <Modal :redrawDataTable="redrawDataTable" /> -->
+
+        <div
+            class="modal fade"
+            id="modalProducts"
+            tabindex="-1"
+            role="dialog"
+            aria-labelledby="modalProductsLabel"
+            aria-hidden="true"
+        >
+            <div
+                class="modal-dialog modal-lg modal-dialog-centered"
+                role="document"
+            >
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h6 class="modal-title m-0" id="modalProductsLabel">
+                            Produk
+                        </h6>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                        ></button>
+                    </div>
+                    <!--end modal-header-->
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table
+                                class="table"
+                                id="datatables"
+                                style="width: 100%"
+                            >
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Unit</th>
+                                        <th>Stock</th>
+                                        <!-- <th>Harga</th> -->
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!--end modal-body-->
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-de-secondary btn-sm"
+                            data-bs-dismiss="modal"
+                        >
+                            Close
+                        </button>
+                    </div>
+                    <!--end modal-footer-->
+                </div>
+                <!--end modal-content-->
+            </div>
+            <!--end modal-dialog-->
+        </div>
+        <!--end modal-->
     </AuthenticatedLayout>
 </template>
