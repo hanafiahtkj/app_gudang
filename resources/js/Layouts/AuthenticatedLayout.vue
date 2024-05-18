@@ -95,7 +95,7 @@ const submit = () => {
                             <img
                                 :src="
                                     route('index') +
-                                    '/vendor/metrica/dist/assets/images/users/user-4.jpg'
+                                    '/vendor/metrica/dist/assets/images/users/dr-pro.png'
                                 "
                                 alt="profile-user"
                                 class="rounded-circle me-0 me-md-2 thumb-sm"
