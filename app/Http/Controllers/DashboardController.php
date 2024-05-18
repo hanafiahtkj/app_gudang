@@ -20,15 +20,18 @@ class DashboardController extends Controller
             'tot_purchases' => DB::table('purchases')
                 ->join('purchase_details', 'purchases.id', '=', 'purchase_details.purchase_id')
                 ->whereDate('purchases.date', '=', now()->toDateString())
-                ->count(),
+                ->distinct('purchase_details.product_id')
+                ->count('purchase_details.product_id'),
             'tot_sales' => DB::table('sales')
                 ->join('sale_details', 'sales.id', '=', 'sale_details.sale_id')
                 ->whereDate('sales.sale_date', '=', now()->toDateString())
-                ->count(),
+                ->distinct('sale_details.product_id')
+                ->count('sale_details.product_id'),
             'tot_stock_reductions'=> DB::table('stock_reductions')
                 ->join('stock_reduction_details', 'stock_reductions.id', '=', 'stock_reduction_details.stock_reduction_id')
                 ->whereDate('stock_reductions.stock_reduction_date', '=', now()->toDateString())
-                ->count(),
+                ->distinct('stock_reduction_details.product_id')
+                ->count('stock_reduction_details.product_id'),
         ]);
     }
 }
