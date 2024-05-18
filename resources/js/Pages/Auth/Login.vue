@@ -121,7 +121,7 @@ const submit = () => {
                                                     <img
                                                         :src="
                                                             route('index') +
-                                                            '/vendor/metrica/dist/assets/images/logo-sm.png'
+                                                            '/assets/img/jack.png'
                                                         "
                                                         height="50"
                                                         alt="logo"

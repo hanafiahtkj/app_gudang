@@ -3,10 +3,12 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head } from "@inertiajs/vue3";
 
 const props = defineProps({
+    today: String,
     tot_products: Number,
     tot_purchases: Number,
     tot_sales: Number,
     tot_warehouses: Number,
+    tot_stock_reductions: Number,
 });
 </script>
 
@@ -31,33 +33,26 @@ const props = defineProps({
                             </ol> -->
                         </div>
                         <!--end col-->
-                        <!-- <div class="col-auto align-self-center">
-                                    <a
-                                        href="#"
-                                        class="btn btn-sm btn-outline-primary"
-                                        id="Dash_Date"
-                                    >
-                                        <span class="day-name" id="Day_Name"
-                                            >Today:</span
-                                        >&nbsp;
-                                        <span class="" id="Select_date"
-                                            >Jan 11</span
-                                        >
-                                        <i
-                                            data-feather="calendar"
-                                            class="align-self-center icon-xs ms-1"
-                                        ></i>
-                                    </a>
-                                    <a
-                                        href="#"
-                                        class="btn btn-sm btn-outline-primary"
-                                    >
-                                        <i
-                                            data-feather="download"
-                                            class="align-self-center icon-xs"
-                                        ></i>
-                                    </a>
-                                </div> -->
+                        <div class="col-auto align-self-center">
+                            <h5 href="#" class="" id="Dash_Date">
+                                <span class="day-name" id="Day_Name"
+                                    >Hari ini :</span
+                                >&nbsp;
+                                <span class="" id="Select_date">{{
+                                    today
+                                }}</span>
+                                <i
+                                    data-feather="calendar"
+                                    class="align-self-center icon-xs ms-1"
+                                ></i>
+                            </h5>
+                            <!-- <a href="#" class="btn btn-sm btn-outline-primary">
+                                <i
+                                    data-feather="download"
+                                    class="align-self-center icon-xs"
+                                ></i>
+                            </a> -->
+                        </div>
                         <!--end col-->
                     </div>
                     <!--end row-->
@@ -68,43 +63,15 @@ const props = defineProps({
         </div>
         <!--end row-->
         <div class="row">
-            <div class="col-12 col-md-4 col-lg-3">
-                <div class="card overflow-hidden">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <span class="h4 fw-bold">{{
-                                    tot_products
-                                }}</span>
-                                <h6
-                                    class="text-uppercase text-muted mt-2 m-0 font-11"
-                                >
-                                    Produk
-                                </h6>
-                            </div>
-                            <!--end col-->
-                            <div class="col-auto">
-                                <i
-                                    class="lab la-accessible-icon display-3 text-secondary position-absolute o-1 translate-middle"
-                                ></i>
-                            </div>
-                            <!--end col-->
-                        </div>
-                        <!-- end row -->
-                    </div>
-                    <!--end card-body-->
-                </div>
-                <!--end card-->
-            </div>
             <!--end col-->
-            <div class="col-12 col-md-4 col-lg-3">
+            <div class="col-12 col-md-4 col-lg-4">
                 <div class="card overflow-hidden">
                     <div class="card-body">
                         <div class="row align-items-center">
                             <div class="col">
-                                <span class="h4 fw-bold">{{
-                                    tot_purchases
-                                }}</span>
+                                <span class="h4 fw-bold"
+                                    >{{ tot_purchases }} Produk</span
+                                >
                                 <h6
                                     class="text-uppercase text-muted mt-2 m-0 font-11"
                                 >
@@ -126,12 +93,14 @@ const props = defineProps({
                 <!--end card-->
             </div>
             <!--end col-->
-            <div class="col-12 col-md-4 col-lg-3">
+            <div class="col-12 col-md-4 col-lg-4">
                 <div class="card overflow-hidden">
                     <div class="card-body">
                         <div class="row align-items-center">
                             <div class="col">
-                                <span class="h4 fw-bold">{{ tot_sales }}</span>
+                                <span class="h4 fw-bold"
+                                    >{{ tot_sales }} Produk</span
+                                >
                                 <h6
                                     class="text-uppercase text-muted mt-2 m-0 font-11"
                                 >
@@ -153,18 +122,18 @@ const props = defineProps({
                 <!--end card-->
             </div>
             <!--end col-->
-            <div class="col-12 col-md-4 col-lg-3">
+            <div class="col-12 col-md-4 col-lg-4">
                 <div class="card overflow-hidden">
                     <div class="card-body">
                         <div class="row align-items-center">
                             <div class="col">
-                                <span class="h4 fw-bold">{{
-                                    tot_warehouses
-                                }}</span>
+                                <span class="h4 fw-bold"
+                                    >{{ tot_stock_reductions }} Produk</span
+                                >
                                 <h6
                                     class="text-uppercase text-muted mt-2 m-0 font-11"
                                 >
-                                    Gudang
+                                    Penyusutan
                                 </h6>
                             </div>
                             <!--end col-->

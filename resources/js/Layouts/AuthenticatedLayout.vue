@@ -52,10 +52,7 @@ const submit = () => {
             <a :href="route('index')" class="logo">
                 <span>
                     <img
-                        :src="
-                            route('index') +
-                            '/vendor/metrica/dist/assets/images/logo-sm.png'
-                        "
+                        :src="route('index') + '/assets/img/jack.png'"
                         alt="logo-small"
                         class="logo-sm"
                     />
