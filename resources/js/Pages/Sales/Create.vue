@@ -70,17 +70,19 @@ const removeProduct = (index) => {
 const totalAmount = computed(() => {
     let total = 0;
     form.sale_details.forEach((detail) => {
-        total += detail.total;
+        let amount = parseFloat(detail.total).toFixed(2);
+        total += parseFloat(amount);
     });
-    return total;
+    return parseFloat(total.toFixed(2));
 });
 
 const totalProducts = computed(() => {
     let total = 0;
     form.sale_details.forEach((detail) => {
-        total += detail.quantity;
+        let quantity = parseFloat(detail.quantity).toFixed(2);
+        total += parseFloat(quantity);
     });
-    return total;
+    return parseFloat(total.toFixed(2));
 });
 
 watchEffect(() => {
